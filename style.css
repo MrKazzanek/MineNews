@@ -120,41 +120,38 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var
 .markdown-body img { max-width: 100%; border-radius: 8px; margin-top: 20px; cursor: zoom-in; display: block; }
 .img-caption { display: block; text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px; margin-top: 5px; font-style: italic; }
 
-/* Callouts */
+/* Callouts - NAPRAWIONE WYRÓWNANIE */
 .callout {
     display: flex;
-    gap: 16px;              /* Odstęp między ikoną a tekstem */
-    padding: 16px 20px;     /* Wewnętrzny odstęp ramki */
+    gap: 16px;              
+    padding: 16px 20px;     
     border-radius: 8px;
     margin: 25px 0;
-    border-left: 5px solid; /* Kolorowy pasek z lewej */
+    border-left: 5px solid; 
     background: var(--bg-color);
-    
-    /* Klucz do wyrównania: */
-    align-items: flex-start; /* Ikona i tekst startują od góry */
+    align-items: flex-start;
 }
 
 .callout-icon {
-    font-size: 1.25rem;     /* Rozmiar ikonki */
-    line-height: 1.6;       /* Identyczna interlinia jak w tekście - to naprawia wyrównanie */
-    flex-shrink: 0;         /* Zapobiega zgniataniu ikony */
-    margin-top: 0;          /* Usunięcie zbędnych marginesów */
-    width: 24px;            /* Stała szerokość dla spójności */
+    font-size: 1.25rem;     
+    line-height: 1.6;       
+    flex-shrink: 0;         
+    margin-top: 0;          
+    width: 24px;            
     text-align: center;
 }
 
 .callout-content {
-    flex: 1;                /* Zajmuje resztę miejsca */
-    min-width: 0;           /* Zapobiega wyjeżdżaniu tekstu poza ramkę */
+    flex: 1;                
+    min-width: 0;           
     font-size: 1rem;
-    line-height: 1.6;       /* Spójna interlinia */
-    align-self: center;     /* Jeśli tekst ma 1 linię, wyśrodkuje się, jeśli więcej - zostanie na górze dzięki flex-start rodzica */
-    align-self: flex-start; /* Wróć: Zawsze od góry, żeby pasowało do pierwszej linii */
-    margin-top: -1px;       /* Mikro-korekta optyczna dla czcionki Inter */
+    line-height: 1.6;       
+    align-self: flex-start; 
+    margin-top: -1px;       
 }
 
 .callout-content p {
-    margin: 0;              /* Bardzo ważne: usuwa domyślny odstęp paragrafu */
+    margin: 0;              
     padding: 0;
 }
 
@@ -165,7 +162,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: var
 .callout-danger { border-color: #c0392b; color: #c0392b; background: rgba(231, 76, 60, 0.08); }
 
 /* Kolory w trybie ciemnym */
-[data-theme="dark"] .callout { background: rgba(255,255,255,0.03); } /* Delikatne tło */
+[data-theme="dark"] .callout { background: rgba(255,255,255,0.03); } 
 [data-theme="dark"] .callout-note { color: #85c1e9; border-color: #3498db; }
 [data-theme="dark"] .callout-warning { color: #f8c471; border-color: #f39c12; }
 [data-theme="dark"] .callout-tip { color: #82e0aa; border-color: #27ae60; }
