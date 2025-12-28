@@ -2,7 +2,7 @@
 <html lang="pl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>MineNews Studio Ultimate</title>
+    <title>MineNews Studio - Edytor</title>
     <!-- Fonty -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Biblioteki -->
@@ -66,10 +66,8 @@
             gap: 12px;
             overflow-y: auto;
             flex-shrink: 0;
-            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             z-index: 10;
         }
-        .sidebar.hidden { margin-left: -320px; }
 
         .brand {
             font-size: 1.1rem;
@@ -83,10 +81,13 @@
         }
         .brand span i { color: var(--accent); margin-right: 8px; }
 
+        .reset-btn { background: none; border: none; color: #666; cursor: pointer; font-size: 0.9rem; transition: 0.2s; }
+        .reset-btn:hover { color: #c0392b; }
+
         .form-group { display: flex; flex-direction: column; gap: 5px; }
         .form-group label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
-        input, select {
+        input {
             background: var(--bg-input);
             border: 1px solid var(--border);
             color: #fff;
@@ -97,7 +98,7 @@
             transition: 0.2s;
             width: 100%;
         }
-        input:focus, select:focus { outline: none; border-color: var(--accent); }
+        input:focus { outline: none; border-color: var(--accent); }
 
         /* Snapshot Section */
         .snapshots {
@@ -109,11 +110,14 @@
         }
         .snap-item {
             display: flex; justify-content: space-between; align-items: center;
-            font-size: 0.8rem; background: var(--bg-input); padding: 5px 10px; border-radius: 4px; cursor: pointer;
+            font-size: 0.8rem; background: var(--bg-input); padding: 8px 10px; border-radius: 4px;
         }
         .snap-item:hover { background: #383838; }
-        .snap-actions i { margin-left: 5px; cursor: pointer; opacity: 0.6; }
-        .snap-actions i:hover { opacity: 1; color: #e74c3c; }
+        .snap-info { cursor: pointer; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .snap-actions { display: flex; gap: 8px; }
+        .snap-actions i { cursor: pointer; opacity: 0.6; transition: 0.2s; }
+        .snap-actions i.fa-upload:hover { opacity: 1; color: var(--accent); }
+        .snap-actions i.fa-trash:hover { opacity: 1; color: #e74c3c; }
 
         /* File Actions */
         .file-actions {
@@ -133,38 +137,30 @@
         .btn-primary:hover { background: var(--accent-hover); }
         .btn-secondary { background: #333; color: #ccc; }
         .btn-secondary:hover { background: #444; color: #fff; }
-        .btn-small { padding: 4px 8px; font-size: 0.75rem; }
+        .btn-small { padding: 6px; font-size: 0.75rem; width: 100%; margin-bottom: 10px; }
 
         /* --- MAIN AREA --- */
         .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 
         /* TOP BAR */
-        .top-bar {
+        .toolbar {
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border);
+            padding: 8px 10px;
             display: flex;
-            align-items: center;
-            padding: 5px 10px;
-            gap: 10px;
-            height: 50px;
-        }
-
-        .toolbar {
-            flex: 1;
-            display: flex;
-            gap: 8px;
+            gap: 5px;
             flex-wrap: wrap;
             align-items: center;
             overflow-x: auto;
-            padding-bottom: 2px;
         }
-        .toolbar::-webkit-scrollbar { height: 0px; }
+        .toolbar::-webkit-scrollbar { height: 4px; }
+        .toolbar::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
 
         .toolbar-group {
             display: flex;
             gap: 2px;
-            padding-right: 8px;
-            margin-right: 8px;
+            padding-right: 6px;
+            margin-right: 6px;
             border-right: 1px solid var(--border);
             align-items: center;
         }
@@ -172,15 +168,16 @@
 
         .t-btn {
             background: transparent; border: 1px solid transparent; color: var(--text-muted);
-            width: 30px; height: 30px; border-radius: 4px; cursor: pointer;
+            width: 32px; height: 32px; border-radius: 4px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            transition: 0.1s; position: relative; font-family: var(--font-ui); font-weight: 600; font-size: 0.85rem;
+            transition: 0.1s; position: relative; font-family: var(--font-ui); font-weight: 600; font-size: 0.8rem;
         }
         .t-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
         .t-btn.active { background: var(--accent); color: #fff; }
+        .t-btn i { font-size: 0.9rem; }
         
         .color-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.3); }
-        input[type="color"] { width: 0; height: 0; visibility: hidden; padding: 0; border: none; }
+        input[type="color"] { width: 0; height: 0; visibility: hidden; padding: 0; border: none; position: absolute; }
 
         /* EDITOR SPLIT */
         .editor-container { flex: 1; display: flex; overflow: hidden; }
@@ -243,20 +240,25 @@
             padding: 40px;
             overflow-y: auto;
             color: #e0e0e0;
-            scroll-behavior: smooth;
+            scroll-behavior: auto; /* Obsługiwane przez JS */
         }
 
         /* --- PREVIEW STYLES --- */
         .preview-content { font-family: 'Inter', sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; }
-        .preview-content h1, .preview-content h2, .preview-content h3 { color: #fff; margin: 20px 0 10px; line-height: 1.3; }
+        .preview-content h1, .preview-content h2, .preview-content h3, .preview-content h4 { color: #fff; margin: 20px 0 10px; line-height: 1.3; }
         .preview-content h1 { font-size: 2.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .preview-content h2 { font-size: 1.8rem; border-bottom: 1px solid #333; padding-bottom: 8px; }
         .preview-content p { margin-bottom: 15px; color: #ccc; }
         .preview-content img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
-        .preview-content a { color: var(--accent); text-decoration: none; }
-        .preview-content blockquote { border-left: 4px solid var(--accent); padding-left: 15px; color: #888; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 0 4px 4px 0; }
+        .preview-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+        .preview-content hr { border: none; border-top: 1px solid #333; margin: 30px 0; }
+        
+        .preview-content blockquote { border-left: 4px solid var(--accent); padding-left: 15px; color: #888; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 0 4px 4px 0; margin: 20px 0; }
+        
         .preview-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.9em; }
         .preview-content pre { background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 20px 0; border: 1px solid #333; }
         .preview-content pre code { background: none; padding: 0; }
+        
         .preview-content table { width: 100%; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; margin: 20px 0; border: 1px solid #333; }
         .preview-content th, .preview-content td { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
         .preview-content th { background: rgba(255,255,255,0.05); color: #fff; }
@@ -275,38 +277,23 @@
         .toast { position: fixed; bottom: 40px; right: 20px; background: var(--accent); color: white; padding: 10px 20px; border-radius: 4px; font-weight: 600; transform: translateY(100px); transition: 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .toast.show { transform: translateY(0); }
 
-        /* Focus Mode */
-        body.focus-mode .sidebar, body.focus-mode .top-bar, body.focus-mode .status-bar, body.focus-mode .pane-header { display: none; }
-        body.focus-mode .editor-container { border: none; }
-        body.focus-mode #content { padding: 40px 20%; font-size: 1.1rem; }
-        body.focus-mode .preview-pane { display: none; }
-        body.focus-mode .exit-focus { display: block; }
-        .exit-focus { position: fixed; top: 20px; right: 20px; background: #333; color: #fff; padding: 10px; border-radius: 50%; cursor: pointer; display: none; z-index: 2000; }
+        /* Drag Overlay */
+        .drag-overlay { position: absolute; inset: 0; background: rgba(39, 174, 96, 0.2); border: 2px dashed var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 50; opacity: 0; pointer-events: none; transition: 0.2s; backdrop-filter: blur(2px); }
+        .drag-overlay.active { opacity: 1; }
 
     </style>
 </head>
 <body>
 
     <div id="global-tooltip">Tooltip</div>
-    <div class="exit-focus" onclick="toggleFocus()" title="Wyjdź z trybu Focus"><i class="fas fa-compress"></i></div>
 
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="brand">
-            <span><i class="fas fa-cube"></i> Studio</span>
-            <button class="t-btn" onclick="resetForm()" data-tooltip="Wyczyść wszystko"><i class="fas fa-trash-alt"></i></button>
+            <span><i class="fas fa-cube"></i> MineNews Studio</span>
+            <button class="reset-btn" onclick="resetForm()" data-tooltip="Wyczyść wszystko"><i class="fas fa-trash-alt"></i></button>
         </div>
         
-        <div class="form-group">
-            <label>Szablon</label>
-            <select id="templateSelect" onchange="applyTemplate()">
-                <option value="">-- Wybierz szablon --</option>
-                <option value="news">📰 News / Aktualizacja</option>
-                <option value="guide">📘 Poradnik</option>
-                <option value="list">📋 Top Lista</option>
-            </select>
-        </div>
-
         <div class="form-group">
             <label>Metadane Artykułu</label>
             <input type="text" id="title" placeholder="Tytuł artykułu">
@@ -318,7 +305,7 @@
         </div>
 
         <div class="form-group">
-            <label>Kopie Zapasowe (Snapshots)</label>
+            <label>Kopie Zapasowe</label>
             <button class="btn btn-secondary btn-small" onclick="saveSnapshot()"><i class="fas fa-save"></i> Utwórz Punkt Przywracania</button>
             <div class="snapshots" id="snapshotList"></div>
         </div>
@@ -335,64 +322,90 @@
     </div>
 
     <!-- MAIN -->
-    <div class="main">
-        <!-- TOP BAR -->
-        <div class="top-bar">
-            <button class="t-btn" onclick="toggleSidebar()" data-tooltip="Pokaż/Ukryj Panel"><i class="fas fa-bars"></i></button>
-            
-            <div class="toolbar">
-                <div class="toolbar-group">
-                    <button class="t-btn" onclick="ins('# ', '')" data-tooltip="Nagłówek 1">H1</button>
-                    <button class="t-btn" onclick="ins('## ', '')" data-tooltip="Nagłówek 2">H2</button>
-                    <button class="t-btn" onclick="ins('### ', '')" data-tooltip="Nagłówek 3">H3</button>
-                </div>
-                <div class="toolbar-group">
-                    <button class="t-btn" onclick="ins('**', '**')" data-tooltip="Pogrubienie (Ctrl+B)"><i class="fas fa-bold"></i></button>
-                    <button class="t-btn" onclick="ins('*', '*')" data-tooltip="Kursywa (Ctrl+I)"><i class="fas fa-italic"></i></button>
-                    <button class="t-btn" onclick="ins('~~', '~~')" data-tooltip="Przekreślenie"><i class="fas fa-strikethrough"></i></button>
-                    <button class="t-btn" onclick="ins('<u>', '</u>')" data-tooltip="Podkreślenie (Ctrl+U)"><i class="fas fa-underline"></i></button>
-                </div>
-                <div class="toolbar-group">
-                    <button class="t-btn" onclick="insColor('red')" data-tooltip="Czerwony"><span class="color-dot" style="background:#ff5555"></span></button>
-                    <button class="t-btn" onclick="insColor('#27ae60')" data-tooltip="Zielony"><span class="color-dot" style="background:#27ae60"></span></button>
-                    <button class="t-btn" onclick="insColor('#3498db')" data-tooltip="Niebieski"><span class="color-dot" style="background:#3498db"></span></button>
-                    <button class="t-btn" onclick="openColorPicker()" data-tooltip="Wybierz Kolor HEX"><i class="fas fa-palette"></i></button>
-                    <input type="color" id="colorPicker" onchange="insColor(this.value)">
-                </div>
-                <div class="toolbar-group">
-                    <button class="t-btn" onclick="ins('\n- ', '')" data-tooltip="Lista punktowana"><i class="fas fa-list-ul"></i></button>
-                    <button class="t-btn" onclick="ins('\n1. ', '')" data-tooltip="Lista numerowana"><i class="fas fa-list-ol"></i></button>
-                    <button class="t-btn" onclick="ins('\n- [ ] ', '')" data-tooltip="Lista zadań"><i class="fas fa-check-square"></i></button>
-                </div>
-                <div class="toolbar-group">
-                    <button class="t-btn" onclick="ins('> [!NOTE]\n> ', '')" data-tooltip="Notatka" style="color:#5dade2"><i class="fas fa-info-circle"></i></button>
-                    <button class="t-btn" onclick="ins('> [!WARNING]\n> ', '')" data-tooltip="Ostrzeżenie" style="color:#f5b041"><i class="fas fa-exclamation-triangle"></i></button>
-                    <button class="t-btn" onclick="ins('> [!DANGER]\n> ', '')" data-tooltip="Niebezpieczeństwo" style="color:#ec7063"><i class="fas fa-bomb"></i></button>
-                </div>
-                <div class="toolbar-group">
-                    <button class="t-btn" onclick="insertLink()" data-tooltip="Wstaw Link"><i class="fas fa-link"></i></button>
-                    <button class="t-btn" onclick="insertImage()" data-tooltip="Wstaw Obraz"><i class="far fa-image"></i></button>
-                    <button class="t-btn" onclick="ins('[](youtube:ID)', '')" data-tooltip="YouTube Embed"><i class="fab fa-youtube"></i></button>
-                    <button class="t-btn" onclick="ins('\n```java\n', '\n```\n')" data-tooltip="Blok Kodu"><i class="fas fa-code"></i></button>
-                    <button class="t-btn" onclick="ins('<div class=\x22tabs\x22 data-labels=\x22A,B\x22>\n<div>A</div>\n<div>B</div>\n</div>', '')" data-tooltip="Zakładki"><i class="fas fa-folder"></i></button>
-                </div>
+    <div class="main" id="dropZone">
+        <div class="drag-overlay" id="dragOverlay">Upuść plik .md tutaj, aby otworzyć</div>
+
+        <!-- TOOLBAR -->
+        <div class="toolbar">
+            <!-- Headers -->
+            <div class="toolbar-group">
+                <button class="t-btn" onclick="ins('# ', '')" data-tooltip="Nagłówek 1">H1</button>
+                <button class="t-btn" onclick="ins('## ', '')" data-tooltip="Nagłówek 2">H2</button>
+                <button class="t-btn" onclick="ins('### ', '')" data-tooltip="Nagłówek 3">H3</button>
+                <button class="t-btn" onclick="ins('#### ', '')" data-tooltip="Nagłówek 4">H4</button>
             </div>
 
+            <!-- Text Formatting -->
             <div class="toolbar-group">
+                <button class="t-btn" onclick="ins('**', '**')" data-tooltip="Pogrubienie (Ctrl+B)"><i class="fas fa-bold"></i></button>
+                <button class="t-btn" onclick="ins('*', '*')" data-tooltip="Kursywa (Ctrl+I)"><i class="fas fa-italic"></i></button>
+                <button class="t-btn" onclick="ins('~~', '~~')" data-tooltip="Przekreślenie"><i class="fas fa-strikethrough"></i></button>
+                <button class="t-btn" onclick="ins('<u>', '</u>')" data-tooltip="Podkreślenie (Ctrl+U)"><i class="fas fa-underline"></i></button>
+                <button class="t-btn" onclick="ins('||', '||')" data-tooltip="Spoiler (Ukryty)"><i class="fas fa-eye-slash"></i></button>
+                <button class="t-btn" onclick="ins('`', '`')" data-tooltip="Kod w linii"><i class="fas fa-code"></i></button>
+            </div>
+
+            <!-- Colors -->
+            <div class="toolbar-group">
+                <button class="t-btn" onclick="insColor('red')" data-tooltip="Czerwony"><span class="color-dot" style="background:#ff5555"></span></button>
+                <button class="t-btn" onclick="insColor('#27ae60')" data-tooltip="Zielony"><span class="color-dot" style="background:#27ae60"></span></button>
+                <button class="t-btn" onclick="insColor('#3498db')" data-tooltip="Niebieski"><span class="color-dot" style="background:#3498db"></span></button>
+                <button class="t-btn" onclick="insColor('gold')" data-tooltip="Złoty"><span class="color-dot" style="background:gold"></span></button>
+                <button class="t-btn" onclick="openColorPicker()" data-tooltip="Wybierz Kolor"><i class="fas fa-palette"></i></button>
+                <input type="color" id="colorPicker" onchange="insColor(this.value)">
+            </div>
+
+            <!-- Lists & Structure -->
+            <div class="toolbar-group">
+                <button class="t-btn" onclick="ins('\n- ', '')" data-tooltip="Lista punktowana"><i class="fas fa-list-ul"></i></button>
+                <button class="t-btn" onclick="ins('\n1. ', '')" data-tooltip="Lista numerowana"><i class="fas fa-list-ol"></i></button>
+                <button class="t-btn" onclick="ins('\n- [ ] ', '')" data-tooltip="Lista zadań"><i class="fas fa-check-square"></i></button>
+                <button class="t-btn" onclick="ins('\n> ', '')" data-tooltip="Cytat"><i class="fas fa-quote-right"></i></button>
+                <button class="t-btn" onclick="ins('\n---\n', '')" data-tooltip="Linia pozioma"><i class="fas fa-minus"></i></button>
+            </div>
+
+            <!-- Callouts -->
+            <div class="toolbar-group">
+                <button class="t-btn" onclick="ins('> [!NOTE]\n> ', '')" data-tooltip="Info" style="color:#5dade2"><i class="fas fa-info-circle"></i></button>
+                <button class="t-btn" onclick="ins('> [!WARNING]\n> ', '')" data-tooltip="Ostrzeżenie" style="color:#f5b041"><i class="fas fa-exclamation-triangle"></i></button>
+                <button class="t-btn" onclick="ins('> [!TIP]\n> ', '')" data-tooltip="Wskazówka" style="color:#58d68d"><i class="fas fa-lightbulb"></i></button>
+                <button class="t-btn" onclick="ins('> [!DANGER]\n> ', '')" data-tooltip="Niebezpieczeństwo" style="color:#ec7063"><i class="fas fa-bomb"></i></button>
+            </div>
+
+            <!-- Media & Complex -->
+            <div class="toolbar-group">
+                <button class="t-btn" onclick="insertLink()" data-tooltip="Wstaw Link"><i class="fas fa-link"></i></button>
+                <button class="t-btn" onclick="insertImage()" data-tooltip="Wstaw Obraz"><i class="far fa-image"></i></button>
+                <button class="t-btn" onclick="ins('[](youtube:ID)', '')" data-tooltip="YouTube Embed"><i class="fab fa-youtube"></i></button>
+                <button class="t-btn" onclick="ins('\n```java\n', '\n```\n')" data-tooltip="Blok Kodu"><i class="fas fa-file-code"></i></button>
+                <button class="t-btn" onclick="ins('\n| Nagł 1 | Nagł 2 |\n|---|---|\n| Treść 1 | Treść 2 |\n', '')" data-tooltip="Tabela"><i class="fas fa-table"></i></button>
+                <button class="t-btn" onclick="ins('<div class=\x22tabs\x22 data-labels=\x22A,B\x22>\n<div>\n\nTreść A\n\n</div>\n<div>\n\nTreść B\n\n</div>\n</div>', '')" data-tooltip="Zakładki (Tabs)"><i class="fas fa-folder"></i></button>
+            </div>
+
+            <!-- Editor Tools -->
+            <div class="toolbar-group" style="margin-left: auto; border-right: none;">
                 <button class="t-btn" onclick="changeFontSize(-1)" data-tooltip="Mniejsza czcionka"><i class="fas fa-font" style="font-size:0.7em"></i></button>
                 <button class="t-btn" onclick="changeFontSize(1)" data-tooltip="Większa czcionka"><i class="fas fa-font"></i></button>
+                <button class="t-btn active" onclick="toggleSyncScroll()" id="syncBtn" data-tooltip="Synchronizuj przewijanie"><i class="fas fa-arrows-alt-v"></i></button>
             </div>
-            
-            <button class="t-btn" onclick="toggleSyncScroll()" id="syncBtn" data-tooltip="Synchronizuj przewijanie"><i class="fas fa-arrows-alt-v"></i></button>
-            <button class="t-btn" onclick="toggleFocus()" data-tooltip="Tryb Focus (Zen)"><i class="fas fa-expand"></i></button>
-            <button class="t-btn" onclick="downloadHTML()" data-tooltip="Pobierz HTML"><i class="fab fa-html5"></i></button>
         </div>
 
+        <!-- EDITOR SPLIT -->
         <div class="editor-container">
             <div class="editor-pane">
+                <div class="pane-header">
+                    <span>Markdown</span>
+                    <div class="stats" style="font-weight:400; opacity:0.7">
+                        <span id="charCount">0 znaków</span>
+                    </div>
+                </div>
                 <textarea id="content" placeholder="Zacznij pisać..."></textarea>
             </div>
             <div class="editor-pane" style="background: #121212;">
+                <div class="pane-header">
+                    <span>Podgląd na żywo</span>
+                    <span id="readTime" style="color:var(--accent)">0 min czytania</span>
+                </div>
                 <div class="preview-pane" id="previewPane">
                     <div id="previewCanvas" class="preview-content"></div>
                 </div>
@@ -402,8 +415,6 @@
         <div class="status-bar">
             <span id="lineCount">0 linii</span>
             <span id="wordCount">0 słów</span>
-            <span id="charCount">0 znaków</span>
-            <span id="readTime" style="color:var(--accent)">0 min czytania</span>
         </div>
     </div>
 
@@ -432,7 +443,7 @@
             });
         });
 
-        // --- TOOLTIPS SYSTEM (JS BASED) ---
+        // --- TOOLTIPS SYSTEM (Manual to avoid cutting off) ---
         function initTooltips() {
             const tooltip = document.getElementById('global-tooltip');
             document.querySelectorAll('[data-tooltip]').forEach(el => {
@@ -451,8 +462,9 @@
                 tooltip.style.left = (x + 10) + 'px';
                 tooltip.style.top = (y + 15) + 'px';
                 
-                // Zapobieganie wyjściu poza ekran
+                // Prevent overflow
                 if (x + tooltip.offsetWidth > window.innerWidth) tooltip.style.left = (x - tooltip.offsetWidth - 10) + 'px';
+                if (y + tooltip.offsetHeight > window.innerHeight) tooltip.style.top = (y - tooltip.offsetHeight - 10) + 'px';
             }
         }
 
@@ -490,14 +502,6 @@
             else el.classList.remove('font-small');
         }
 
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('hidden');
-        }
-
-        function toggleFocus() {
-            document.body.classList.toggle('focus-mode');
-        }
-
         // --- SYNC SCROLL ---
         function toggleSyncScroll() {
             syncScrollEnabled = !syncScrollEnabled;
@@ -507,27 +511,11 @@
 
         dom.content.addEventListener('scroll', () => {
             if(!syncScrollEnabled) return;
-            const percentage = dom.content.scrollTop / (dom.content.scrollHeight - dom.content.offsetHeight);
-            const preview = document.getElementById('previewPane');
-            preview.scrollTop = percentage * (preview.scrollHeight - preview.offsetHeight);
+            const source = dom.content;
+            const target = document.getElementById('previewPane');
+            const percentage = source.scrollTop / (source.scrollHeight - source.offsetHeight);
+            target.scrollTop = percentage * (target.scrollHeight - target.offsetHeight);
         });
-
-        // --- TEMPLATES ---
-        const templates = {
-            news: "# Tytuł News'a\n\nWitajcie! Dziś mamy dla was garść informacji o aktualizacji...\n\n### Nowości:\n- [ ] Blok 1\n- [ ] Blok 2\n\n> [!NOTE]\n> Pamiętajcie o kopii zapasowej!\n\n![Screen](https://via.placeholder.com/800x400)",
-            guide: "# Jak zbudować X?\n\nTen poradnik pokaże Ci krok po kroku jak to zrobić.\n\n### Wymagane materiały:\n| Ilość | Nazwa |\n|---|---|\n| 64 | Cobblestone |\n| 10 | Redstone |\n\n### Krok 1\nPostaw blok tutaj...",
-            list: "# Top 5 Shaderów\n\n1. **BSL Shaders** - Klasyk\n2. **Complementary** - Nowoczesne\n3. **Sildurs** - Wydajne\n\n> [!TIP]\n> Użyj Iris zamiast Optifine dla lepszej wydajności."
-        };
-
-        function applyTemplate() {
-            const val = document.getElementById('templateSelect').value;
-            if(val && templates[val]) {
-                if(dom.content.value.length > 10 && !confirm("Nadpisać obecną treść?")) return;
-                dom.content.value = templates[val];
-                updatePreview();
-                document.getElementById('templateSelect').value = "";
-            }
-        }
 
         // --- SNAPSHOTS ---
         function saveSnapshot() {
@@ -537,7 +525,7 @@
             inputIds.forEach(id => data[id] = dom[id].value);
             
             snaps.unshift({ name, data });
-            if(snaps.length > 5) snaps.pop(); // Max 5
+            if(snaps.length > 5) snaps.pop();
             localStorage.setItem('mineSnapshots', JSON.stringify(snaps));
             loadSnapshots();
             showToast('Zapisano punkt przywracania');
@@ -550,7 +538,13 @@
             snaps.forEach((snap, idx) => {
                 const div = document.createElement('div');
                 div.className = 'snap-item';
-                div.innerHTML = `<span>${snap.name}</span><div class="snap-actions"><i class="fas fa-upload" onclick="restoreSnap(${idx})"></i></div>`;
+                div.innerHTML = `
+                    <div class="snap-info" onclick="restoreSnap(${idx})" title="Kliknij, aby przywrócić">${snap.name}</div>
+                    <div class="snap-actions">
+                        <i class="fas fa-upload" onclick="restoreSnap(${idx})" title="Przywróć"></i>
+                        <i class="fas fa-trash" onclick="deleteSnap(${idx})" title="Usuń"></i>
+                    </div>
+                `;
                 list.appendChild(div);
             });
         }
@@ -564,7 +558,15 @@
             showToast('Przywrócono wersję');
         };
 
-        // --- FILE OPS (Save/Load) ---
+        window.deleteSnap = function(idx) {
+            const snaps = JSON.parse(localStorage.getItem('mineSnapshots') || '[]');
+            snaps.splice(idx, 1);
+            localStorage.setItem('mineSnapshots', JSON.stringify(snaps));
+            loadSnapshots();
+            showToast('Usunięto kopię');
+        }
+
+        // --- FILE OPS ---
         function sanitizeFilename(text) {
             if(!text) return 'artykul';
             const map = {'ą':'a','ć':'c','ę':'e','ł':'l','ń':'n','ó':'o','ś':'s','ź':'z','ż':'z'};
@@ -629,15 +631,6 @@
             showToast('Plik wczytany');
         }
 
-        function downloadHTML() {
-            const html = document.getElementById('previewCanvas').innerHTML;
-            const blob = new Blob([html], {type: 'text/html'});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'artykul.html';
-            a.click();
-        }
-
         // --- CORE LOGIC ---
         function updatePreview() {
             const raw = dom.content.value;
@@ -646,13 +639,13 @@
             document.getElementById('charCount').textContent = raw.length + " zn.";
             document.getElementById('wordCount').textContent = raw.split(/\s+/).filter(n => n != '').length + " słów";
             document.getElementById('lineCount').textContent = raw.split(/\r\n|\r|\n/).length + " linii";
-            document.getElementById('readTime').textContent = Math.ceil(raw.split(/\s+/).length / 200) + " min";
+            document.getElementById('readTime').textContent = Math.ceil(raw.split(/\s+/).length / 200) + " min czytania";
 
             // Markdown
             let md = raw.replace(/\{c:([a-zA-Z0-9#]+)\}(.*?)\{\/c\}/g, '<span style="color:$1">$2</span>');
             let html = marked.parse(md, { breaks: true, gfm: true });
 
-            // Post-Process (Same as main site)
+            // Post-Process
             html = html.replace(/<blockquote>\s*<p>\s*\[!(NOTE|WARNING|TIP|DANGER)\]\s?(.*?)<\/p>\s*<\/blockquote>/gs, (m, t, c) => {
                 const type = t.toLowerCase();
                 let icon = 'fa-info-circle';
@@ -664,6 +657,7 @@
 
             html = html.replace(/<a href="youtube:([^"]+)">.*?<\/a>/g, '<div class="video-container"><iframe src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
             html = html.replace(/<img src="([^"]+)" alt="([^"]+)">/g, '<img src="$1" alt="$2" title="$2"><span style="display:block;text-align:center;color:#888;font-size:0.8rem;margin-top:5px;font-style:italic;">$2</span>');
+            html = html.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler" title="Spoiler">$1</span>');
             html = html.replace(/<li><input disabled="" type="checkbox"/g, '<li style="list-style:none; display:flex; gap:10px;"><input disabled type="checkbox"');
             html = html.replace(/<li><input checked="" disabled="" type="checkbox"/g, '<li style="list-style:none; display:flex; gap:10px;"><input checked disabled type="checkbox"');
 
@@ -705,10 +699,14 @@
             if(s) { const d = JSON.parse(s); inputIds.forEach(id => { if(d[id]) dom[id].value = d[id]; }); updatePreview(); }
         }
         function resetForm() {
-            if(confirm("Wyczyścić wszystko?")) {
+            if(confirm("Czy na pewno wyczyścić wszystko (w tym kopie zapasowe)?")) {
                 inputIds.forEach(id => dom[id].value = '');
                 dom.date.valueAsDate = new Date();
-                saveStateLocal(); updatePreview();
+                localStorage.removeItem('mineNewsDraft');
+                localStorage.removeItem('mineSnapshots'); // Usuwa też kopie zapasowe
+                loadSnapshots();
+                updatePreview();
+                showToast("Wyczyszczono dane");
             }
         }
         function showToast(msg) {
