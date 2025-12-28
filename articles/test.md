@@ -1,34 +1,23 @@
 ---
-title: System MineNews v2 - Pełna Demonstracja
-author: Admin
-date: 2025-06-01
-image: https://images.unsplash.com/photo-1607528971899-2e89e6c0ec69?auto=format&fit=crop&w=1920&q=80
-categories: [System, Demo, Poradnik]
+title: Witamy w serwisie!
+author: QozaWorks
+date: 2025-12-28
+image: https://i.ibb.co/1sQJ3Bm/Steave-Trzyma-Kamere-by-Bluzers-1920x1080.png
+categories: [Ważne]
 ---
 
-Witaj w nowym systemie! Poniżej prezentujemy wszystkie możliwości formatowania, które możesz wykorzystać w swoich artykułach.
+Witamy w nowym serwisie informacyjnym z świata **Minecraft**. To miejsce stworzyliśmy   z myślą o społeczności tej cudownej gry. Jest to idealna strona dla osób, które chcą być na bieżąco z nowościami z Minecrafta.
 
-### 1. Nowe Ramki (Callouts)
-Teraz tekst znajduje się poprawnie wewnątrz ramki, niezależnie od długości.
+![Logo Serwisu](https://github.com/MrKazzanek/MineNews/blob/main/minenews-logo-full.png?raw=true)
+### Kiedy start?
 
-> [!NOTE]
-> To jest zwykła notatka informacyjna. Możesz tu wpisać cokolwiek chcesz, nawet w wielu liniach.
-> Druga linia tekstu w notatce.
+Oficjalny start serwisu zaplanowany jest na **1 stycznia 2026 roku**. Od tego dnia regularnie będą pojawiać się artykuły prezentujące najnowsze informacje związane z Minecraftem, jego rozwojem i nie tylko.
+***
+### Co takiego tu znajdziecie?
+W serwisie publikowane będą między innymi artykuły opisujące zmiany wprowadzane w nowych snapshotach oraz wersjach preview, szczegółowe omówienia całych dropów wraz z nową zawartością, informacje o nowych wyzwaniach przygotowywanych przez twórców gry, a także opisy i podsumowania nowych materiałów pojawiających się na oficjalnym kanale YouTube Minecrafta. Oprócz tego planowane są inne treści związane z aktualizacjami, zapowiedziami i ciekawostkami ze świata gry.
 
-> [!WARNING]
-> Uwaga! Uważaj na Creepery w jaskiniach. Zawsze noś tarczę.
+***
+### Co dalej?
+Serwis ma charakter informacyjny i społecznościowy. Już wkrótce powstanie specjalny serwer {c:blue}Discord{/c}, na którym każdy zainteresowany będzie mógł dołączyć do społeczności i spróbować swoich sił jako reporter, współtworząc treści oraz dzieląc się informacjami i spostrzeżeniami ze świata Minecraft.
 
-> [!TIP]
-> Wskazówka: Użyj `F3 + B`, aby zobaczyć hitboxy mobów.
-
-> [!DANGER]  Nie kop prosto w dół! Grozi wpadnięciem do lawy.
-
-### 2. Zakładki (Tabs)
-Idealne do pokazywania różnic między wersjami Java i Bedrock.
-
-<div class="tabs" data-labels="Java Edition,Bedrock Edition">
-<div>
-
-W wersji Java używamy komendy:
-```bash
-/data get entity @e[type=pig,limit=1]
+Dziękujemy za zainteresowanie i zapraszamy do śledzenia serwisu od dnia jego oficjalnego startu.
