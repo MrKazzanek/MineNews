@@ -25,7 +25,7 @@ Serwis ma charakter informacyjny i społecznościowy. Już wkrótce powstanie sp
 <br>
 <br>
 
-***
+
 
 ### Najważniejsze z tego artykułu:
 > - **Start serwisu:** 28.12.2025
