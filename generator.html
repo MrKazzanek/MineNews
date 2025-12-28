@@ -2,22 +2,27 @@
 <html lang="pl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>MineNews Studio - Generator</title>
+    <title>MineNews Studio - Edytor</title>
+    <!-- Fonty -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Biblioteka Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Ikony -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
             --bg-app: #121212;
             --bg-panel: #1e1e1e;
-            --bg-input: #252526;
+            --bg-input: #2d2d2d;
             --border: #333;
-            --accent: #8827ae;
-            --accent-hover: #9d42c3;
+            --accent: #27ae60;
+            --accent-hover: #219150;
             --text-main: #e0e0e0;
             --text-muted: #858585;
             --font-ui: 'Inter', sans-serif;
             --font-code: 'JetBrains Mono', monospace;
+            --tooltip-bg: #333;
         }
 
         * { box-sizing: border-box; }
@@ -32,9 +37,9 @@
             overflow: hidden;
         }
 
-        /* --- SIDEBAR (METADATA) --- */
+        /* --- SIDEBAR --- */
         .sidebar {
-            width: 320px;
+            width: 340px;
             background: var(--bg-panel);
             border-right: 1px solid var(--border);
             display: flex;
@@ -43,6 +48,7 @@
             gap: 15px;
             overflow-y: auto;
             flex-shrink: 0;
+            z-index: 10;
         }
 
         .brand {
@@ -52,14 +58,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 10px;
-            padding-bottom: 15px;
+            padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
+            margin-bottom: 10px;
         }
-        .brand span { color: var(--accent); }
+        .brand i { color: var(--accent); }
 
         .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-group label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group label { font-size: 0.7rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         
         input {
             background: var(--bg-input);
@@ -71,13 +77,20 @@
             font-size: 0.9rem;
             transition: 0.2s;
         }
-        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(136, 39, 174, 0.2); }
+        input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2); }
         input::placeholder { color: #555; }
 
-        .btn-gen {
+        /* File Actions Buttons */
+        .file-actions {
             margin-top: auto;
-            background: var(--accent);
-            color: white;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn {
             border: none;
             padding: 12px;
             border-radius: 6px;
@@ -88,11 +101,18 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            font-size: 0.9rem;
+            color: white;
         }
-        .btn-gen:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+        .btn-primary { background: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+        
+        .btn-secondary { background: #333; color: #ccc; }
+        .btn-secondary:hover { background: #444; color: #fff; transform: translateY(-1px); }
 
         /* --- MAIN AREA --- */
-        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+        .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 
         /* TOOLBAR */
         .toolbar {
@@ -100,17 +120,18 @@
             border-bottom: 1px solid var(--border);
             padding: 8px 15px;
             display: flex;
-            gap: 5px;
+            gap: 8px;
             flex-wrap: wrap;
             align-items: center;
         }
 
         .toolbar-group {
             display: flex;
-            gap: 5px;
-            padding-right: 10px;
-            margin-right: 10px;
+            gap: 4px;
+            padding-right: 8px;
+            margin-right: 8px;
             border-right: 1px solid var(--border);
+            align-items: center;
         }
         .toolbar-group:last-child { border: none; }
 
@@ -118,19 +139,38 @@
             background: transparent;
             border: 1px solid transparent;
             color: var(--text-muted);
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.2s;
+            transition: 0.1s;
+            position: relative;
         }
         .t-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
-        .t-btn.wide { width: auto; padding: 0 10px; font-size: 0.85rem; font-weight: 500; }
-        
-        .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+        .t-btn i { font-size: 0.9rem; }
+        .color-dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* TOOLTIP STYLE */
+        .t-btn[data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--tooltip-bg);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            z-index: 100;
+            pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 1px solid var(--border);
+        }
 
         /* EDITOR SPLIT */
         .editor-container {
@@ -144,6 +184,7 @@
             display: flex;
             flex-direction: column;
             border-right: 1px solid var(--border);
+            position: relative;
         }
         
         .pane-header {
@@ -153,6 +194,9 @@
             color: var(--text-muted);
             border-bottom: 1px solid var(--border);
             text-transform: uppercase;
+            font-weight: 700;
+            display: flex;
+            justify-content: space-between;
         }
 
         textarea#content {
@@ -170,30 +214,33 @@
 
         .preview-pane {
             flex: 1;
-            background: #181818; /* Tło podglądu zgodne z main site */
-            padding: 30px;
+            background: #121212; /* Tło podglądu */
+            padding: 40px;
             overflow-y: auto;
             color: #e0e0e0;
         }
 
-        /* --- PREVIEW STYLES (MATCHING MAIN SITE) --- */
-        .preview-content { font-family: 'Inter', sans-serif; line-height: 1.6; }
-        .preview-content h1 { font-size: 2rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-        .preview-content h2 { font-size: 1.5rem; border-bottom: 1px solid #333; padding-bottom: 8px; margin-top: 20px; }
-        .preview-content h3 { font-size: 1.2rem; margin-top: 15px; color: #fff; }
-        .preview-content p { margin-bottom: 15px; }
-        .preview-content img { max-width: 100%; border-radius: 8px; margin: 10px 0; }
-        .preview-content code { background: rgba(255,255,255,0.1); padding: 2px 5px; border-radius: 4px; font-family: var(--font-code); font-size: 0.9em; }
-        .preview-content pre { background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; font-family: var(--font-code); }
-        .preview-content blockquote { border-left: 4px solid var(--accent); padding-left: 15px; color: #888; margin: 15px 0; }
+        /* --- PREVIEW STYLES (Identical to main site) --- */
+        .preview-content { font-family: 'Inter', sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; }
+        .preview-content h1 { font-size: 2.2rem; margin-bottom: 10px; color: #fff; line-height: 1.2; }
+        .preview-content h2 { font-size: 1.6rem; border-bottom: 1px solid #333; padding-bottom: 10px; margin: 30px 0 15px; color: #fff; }
+        .preview-content h3 { font-size: 1.3rem; margin: 25px 0 10px; color: #fff; }
+        .preview-content p { margin-bottom: 15px; color: #ccc; }
+        .preview-content img { max-width: 100%; border-radius: 8px; margin: 15px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .preview-content a { color: var(--accent); text-decoration: none; }
         
-        /* Tables in Preview */
-        .preview-content table { width: 100%; border-collapse: collapse; background: #222; border-radius: 8px; overflow: hidden; margin: 15px 0; }
-        .preview-content th, .preview-content td { padding: 10px; border-bottom: 1px solid #333; text-align: left; }
-        .preview-content th { background: rgba(255,255,255,0.05); }
+        /* Code */
+        .preview-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.9em; }
+        .preview-content pre { background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 20px 0; border: 1px solid #333; }
+        .preview-content pre code { background: none; padding: 0; }
 
-        /* Callouts in Preview */
-        .callout { display: flex; gap: 15px; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 5px solid; background: rgba(255,255,255,0.03); align-items: flex-start; }
+        /* Tables */
+        .preview-content table { width: 100%; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; margin: 20px 0; border: 1px solid #333; }
+        .preview-content th, .preview-content td { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
+        .preview-content th { background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; }
+
+        /* Callouts */
+        .callout { display: flex; gap: 15px; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid; background: rgba(255,255,255,0.03); align-items: flex-start; }
         .callout-icon { font-size: 1.2rem; line-height: 1.6; width: 24px; text-align: center; flex-shrink: 0; margin-top: 0; }
         .callout-content { flex: 1; font-size: 0.95rem; line-height: 1.6; margin-top: -1px; }
         .callout-content p { margin: 0; }
@@ -203,15 +250,29 @@
         .callout-tip { border-color: #27ae60; color: #82e0aa; }
         .callout-danger { border-color: #c0392b; color: #ec7063; }
 
-        /* --- MODAL --- */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.2s; z-index: 200; backdrop-filter: blur(2px); }
-        .modal-overlay.show { opacity: 1; pointer-events: auto; }
-        .modal-box { background: var(--bg-panel); padding: 25px; border-radius: 12px; width: 600px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .modal-header h3 { margin: 0; font-weight: 600; }
-        #finalCode { width: 100%; height: 350px; background: #000; color: #0f0; border: 1px solid var(--border); padding: 15px; font-family: var(--font-code); font-size: 0.85rem; border-radius: 6px; resize: none; }
-        .btn-close { background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; margin-top: 15px; width: 100%; }
-        .btn-close:hover { background: #333; }
+        /* YouTube */
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin: 20px 0; background: #000; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        /* Tabs */
+        .tabs-container { margin: 20px 0; border: 1px solid #333; border-radius: 8px; overflow: hidden; background: #1e1e1e; }
+        .tabs-header { display: flex; background: #181818; border-bottom: 1px solid #333; }
+        .tab-btn { padding: 10px 20px; cursor: pointer; border: none; background: none; font-weight: 600; color: #888; border-bottom: 2px solid transparent; }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: #1e1e1e; }
+        .tab-content { padding: 20px; display: none; border-top: 1px solid #333; }
+        .tab-content.active { display: block; }
+        .tab-content p { margin: 0; }
+
+        /* Checklist */
+        .checklist-item { list-style: none; display: flex; align-items: center; gap: 10px; margin-bottom: 5px; }
+
+        /* Notification */
+        .toast { position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: white; padding: 10px 20px; border-radius: 4px; font-weight: 600; transform: translateY(100px); transition: 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .toast.show { transform: translateY(0); }
+
+        /* Drag Overlay */
+        .drag-overlay { position: absolute; inset: 0; background: rgba(39, 174, 96, 0.2); border: 2px dashed var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 50; opacity: 0; pointer-events: none; transition: 0.2s; backdrop-filter: blur(2px); }
+        .drag-overlay.active { opacity: 1; }
 
     </style>
 </head>
@@ -219,83 +280,99 @@
 
     <!-- SIDEBAR -->
     <div class="sidebar">
-        <div class="brand"><i class="fas fa-cube"></i> MineNews <span>Studio</span></div>
+        <div class="brand"><i class="fas fa-cube"></i> MineNews Studio</div>
         
         <div class="form-group">
             <label>Tytuł artykułu</label>
-            <input type="text" id="title" placeholder="Wpisz tytuł...">
+            <input type="text" id="title" placeholder="np. Nowa aktualizacja 1.21">
         </div>
         <div class="form-group">
             <label>Autor</label>
-            <input type="text" id="author" placeholder="Nick autora">
+            <input type="text" id="author" placeholder="Twój nick">
         </div>
         <div class="form-group">
-            <label>Data</label>
+            <label>Data Publikacji</label>
             <input type="date" id="date">
         </div>
         <div class="form-group">
-            <label>Link do Okładki (URL)</label>
+            <label>Okładka (URL)</label>
             <input type="text" id="image" placeholder="https://...">
         </div>
         <div class="form-group">
-            <label>Link do Avatara (Opcjonalne)</label>
-            <input type="text" id="avatar" placeholder="https://...">
+            <label>Avatar Autora (URL)</label>
+            <input type="text" id="avatar" placeholder="Pozostaw puste dla domyślnego">
         </div>
         <div class="form-group">
-            <label>Kategorie (oddzielone przecinkiem)</label>
-            <input type="text" id="categories" placeholder="np. News, Poradnik, Survival">
+            <label>Kategorie (po przecinku)</label>
+            <input type="text" id="categories" placeholder="News, Poradnik, Survival">
         </div>
 
-        <button class="btn-gen" onclick="generate()">
-            <i class="fas fa-code"></i> Generuj Kod .MD
-        </button>
+        <div class="file-actions">
+            <input type="file" id="fileInput" accept=".md" style="display: none;">
+            <button class="btn btn-secondary" onclick="document.getElementById('fileInput').click()" title="Otwórz plik .md z dysku">
+                <i class="fas fa-folder-open"></i> Otwórz
+            </button>
+            <button class="btn btn-primary" onclick="saveFile()" title="Zapisz plik na dysku">
+                <i class="fas fa-save"></i> Zapisz
+            </button>
+        </div>
+        <div style="font-size: 0.75rem; color: #666; text-align: center; margin-top: 10px;">
+            Auto-zapis w przeglądarce aktywny
+        </div>
     </div>
 
     <!-- MAIN AREA -->
-    <div class="main">
+    <div class="main" id="dropZone">
+        <div class="drag-overlay" id="dragOverlay">Upuść plik .md tutaj</div>
+
         <!-- TOOLBAR -->
         <div class="toolbar">
             <div class="toolbar-group">
-                <button class="t-btn" onclick="ins('**', '**')" title="Pogrubienie"><i class="fas fa-bold"></i></button>
-                <button class="t-btn" onclick="ins('*', '*')" title="Kursywa"><i class="fas fa-italic"></i></button>
-                <button class="t-btn" onclick="ins('### ', '')" title="Nagłówek H3">H3</button>
+                <button class="t-btn" onclick="ins('**', '**')" data-tooltip="Pogrubienie (Bold)"><i class="fas fa-bold"></i></button>
+                <button class="t-btn" onclick="ins('*', '*')" data-tooltip="Kursywa (Italic)"><i class="fas fa-italic"></i></button>
+                <button class="t-btn" onclick="ins('### ', '')" data-tooltip="Nagłówek H3"><i class="fas fa-heading"></i></button>
             </div>
 
             <div class="toolbar-group">
-                <button class="t-btn" onclick="insColor('red')" title="Czerwony"><span class="color-dot" style="background:#ff5555"></span></button>
-                <button class="t-btn" onclick="insColor('#27ae60')" title="Zielony"><span class="color-dot" style="background:#27ae60"></span></button>
-                <button class="t-btn" onclick="insColor('#3498db')" title="Niebieski"><span class="color-dot" style="background:#3498db"></span></button>
-                <button class="t-btn" onclick="insColor('gold')" title="Złoty"><span class="color-dot" style="background:gold"></span></button>
-                <button class="t-btn wide" onclick="ins('{c:#HEX}', '{/c}')" title="Własny HEX">HEX</button>
+                <button class="t-btn" onclick="insColor('red')" data-tooltip="Czerwony tekst"><span class="color-dot" style="background:#ff5555"></span></button>
+                <button class="t-btn" onclick="insColor('#27ae60')" data-tooltip="Zielony tekst"><span class="color-dot" style="background:#27ae60"></span></button>
+                <button class="t-btn" onclick="insColor('#3498db')" data-tooltip="Niebieski tekst"><span class="color-dot" style="background:#3498db"></span></button>
+                <button class="t-btn" onclick="insColor('gold')" data-tooltip="Złoty tekst"><span class="color-dot" style="background:gold"></span></button>
+                <button class="t-btn" onclick="ins('{c:#HEX}', '{/c}')" data-tooltip="Własny kolor HEX" style="font-size: 0.7rem; font-weight:bold;">HEX</button>
             </div>
 
             <div class="toolbar-group">
-                <button class="t-btn wide" onclick="ins('> [!NOTE]\n> ', '')" style="color:#5dade2"><i class="fas fa-sticky-note"></i> Note</button>
-                <button class="t-btn wide" onclick="ins('> [!WARNING]\n> ', '')" style="color:#f5b041"><i class="fas fa-exclamation-triangle"></i> Warn</button>
-                <button class="t-btn wide" onclick="ins('> [!TIP]\n> ', '')" style="color:#58d68d"><i class="fas fa-lightbulb"></i> Tip</button>
-                <button class="t-btn wide" onclick="ins('> [!DANGER]\n> ', '')" style="color:#ec7063"><i class="fas fa-bomb"></i> Danger</button>
+                <button class="t-btn" onclick="ins('> [!NOTE]\n> ', '')" data-tooltip="Notatka (Niebieska)" style="color:#5dade2"><i class="fas fa-sticky-note"></i></button>
+                <button class="t-btn" onclick="ins('> [!WARNING]\n> ', '')" data-tooltip="Ostrzeżenie (Pomarańczowe)" style="color:#f5b041"><i class="fas fa-exclamation-triangle"></i></button>
+                <button class="t-btn" onclick="ins('> [!TIP]\n> ', '')" data-tooltip="Wskazówka (Zielona)" style="color:#58d68d"><i class="fas fa-lightbulb"></i></button>
+                <button class="t-btn" onclick="ins('> [!DANGER]\n> ', '')" data-tooltip="Niebezpieczeństwo (Czerwona)" style="color:#ec7063"><i class="fas fa-bomb"></i></button>
             </div>
 
             <div class="toolbar-group">
-                <button class="t-btn" onclick="ins('![Podpis](', ')')" title="Obrazek"><i class="far fa-image"></i></button>
-                <button class="t-btn" onclick="ins('[](youtube:', ')')" title="YouTube"><i class="fab fa-youtube"></i></button>
-                <button class="t-btn" onclick="ins('\n| Nagłówek 1 | Nagłówek 2 |\n|---|---|\n| Treść 1 | Treść 2 |\n', '')" title="Tabela"><i class="fas fa-table"></i></button>
-                <button class="t-btn" onclick="ins('\n- [ ] Do zrobienia\n- [x] Zrobione\n', '')" title="Lista zadań"><i class="fas fa-check-square"></i></button>
+                <button class="t-btn" onclick="ins('[Tekst](url)', '')" data-tooltip="Link"><i class="fas fa-link"></i></button>
+                <button class="t-btn" onclick="ins('![Podpis](url)', '')" data-tooltip="Zdjęcie"><i class="far fa-image"></i></button>
+                <button class="t-btn" onclick="ins('[](youtube:ID)', '')" data-tooltip="YouTube Embed"><i class="fab fa-youtube"></i></button>
+                <button class="t-btn" onclick="ins('\n```java\nKod tutaj...\n```\n', '')" data-tooltip="Blok kodu"><i class="fas fa-code"></i></button>
             </div>
             
             <div class="toolbar-group">
-                <button class="t-btn wide" onclick="ins('<div class=\x22tabs\x22 data-labels=\x22Java,Bedrock\x22>\n<div>\n\nTreść Java\n\n</div>\n<div>\n\nTreść Bedrock\n\n</div>\n</div>', '')" title="Zakładki"><i class="fas fa-folder"></i> Taby</button>
+                <button class="t-btn" onclick="ins('\n| Nagłówek 1 | Nagłówek 2 |\n|---|---|\n| Treść 1 | Treść 2 |\n', '')" data-tooltip="Tabela"><i class="fas fa-table"></i></button>
+                <button class="t-btn" onclick="ins('\n- [ ] Zadanie 1\n- [x] Zrobione\n', '')" data-tooltip="Lista zadań"><i class="fas fa-check-square"></i></button>
+                <button class="t-btn" onclick="ins('<div class=\x22tabs\x22 data-labels=\x22Java,Bedrock\x22>\n<div>\n\nTreść Java\n\n</div>\n<div>\n\nTreść Bedrock\n\n</div>\n</div>', '')" data-tooltip="Zakładki (Tabs)"><i class="fas fa-folder"></i></button>
             </div>
         </div>
 
         <!-- EDITOR SPLIT -->
         <div class="editor-container">
             <div class="editor-pane">
-                <div class="pane-header">Markdown Source</div>
-                <textarea id="content" placeholder="Tutaj pisz treść swojego artykułu..."></textarea>
+                <div class="pane-header">
+                    <span>Edytor Markdown</span>
+                    <span id="charCount" style="font-weight:400; opacity:0.7">0 znaków</span>
+                </div>
+                <textarea id="content" placeholder="Tutaj pisz treść artykułu..."></textarea>
             </div>
-            <div class="editor-pane" style="background: #181818;">
-                <div class="pane-header">Podgląd (Live Preview)</div>
+            <div class="editor-pane">
+                <div class="pane-header">Podgląd na żywo</div>
                 <div class="preview-pane">
                     <div id="previewCanvas" class="preview-content"></div>
                 </div>
@@ -303,45 +380,222 @@
         </div>
     </div>
 
-    <!-- EXPORT MODAL -->
-    <div class="modal-overlay" id="modal">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h3><i class="fas fa-file-code"></i> Gotowy Kod</h3>
-            </div>
-            <p style="color:#aaa; font-size:0.9rem; margin-bottom:10px;">Skopiuj poniższą treść i zapisz jako plik <code>.md</code> w folderze <code>/articles</code>.</p>
-            <textarea id="finalCode" readonly></textarea>
-            <button class="btn-close" onclick="document.getElementById('modal').classList.remove('show')">Zamknij</button>
-        </div>
-    </div>
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="toast">Powiadomienie</div>
 
     <script>
-        // Init Date
-        document.getElementById('date').valueAsDate = new Date();
-        
-        // Listeners
+        // --- CONFIG & STATE ---
         const inputIds = ['title', 'author', 'date', 'image', 'avatar', 'categories', 'content'];
-        inputIds.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+        const dom = {};
+        inputIds.forEach(id => dom[id] = document.getElementById(id));
+        
+        // Init Date
+        dom.date.valueAsDate = new Date();
 
-        // Insert Text Helper
+        // --- LOAD FROM LOCAL STORAGE (Auto-restore) ---
+        function loadState() {
+            const saved = localStorage.getItem('mineNewsDraft');
+            if(saved) {
+                const data = JSON.parse(saved);
+                inputIds.forEach(id => {
+                    if(data[id]) dom[id].value = data[id];
+                });
+                updatePreview();
+            }
+        }
+        window.addEventListener('load', loadState);
+
+        // --- EVENT LISTENERS ---
+        inputIds.forEach(id => {
+            dom[id].addEventListener('input', () => {
+                updatePreview();
+                saveStateLocal();
+            });
+        });
+
+        // --- LOCAL STORAGE SAVE ---
+        function saveStateLocal() {
+            const data = {};
+            inputIds.forEach(id => data[id] = dom[id].value);
+            localStorage.setItem('mineNewsDraft', JSON.stringify(data));
+        }
+
+        // --- FILE OPERATIONS ---
+        
+        // 1. Sanitize Filename
+        function sanitizeFilename(text) {
+            if(!text) return 'artykul';
+            const map = {
+                'ą':'a', 'ć':'c', 'ę':'e', 'ł':'l', 'ń':'n', 'ó':'o', 'ś':'s', 'ź':'z', 'ż':'z',
+                'Ą':'A', 'Ć':'C', 'Ę':'E', 'Ł':'L', 'Ń':'N', 'Ó':'O', 'Ś':'S', 'Ź':'Z', 'Ż':'Z'
+            };
+            let s = text.split('').map(char => map[char] || char).join('');
+            s = s.replace(/[^a-zA-Z0-9\s-]/g, ''); // Usuń znaki spec.
+            s = s.trim().replace(/\s+/g, '_'); // Spacje na _
+            return s.toLowerCase();
+        }
+
+        // 2. Build Content String
+        function buildFileContent() {
+            const data = {};
+            inputIds.forEach(k => data[k] = dom[k].value);
+            const cats = data.categories.split(',').map(s => s.trim()).filter(s => s);
+            
+            // Frontmatter
+            let file = `---\n`;
+            file += `title: ${data.title}\n`;
+            file += `author: ${data.author}\n`;
+            file += `date: ${data.date}\n`;
+            file += `image: ${data.image}\n`;
+            if(data.avatar) file += `avatar: ${data.avatar}\n`;
+            file += `categories: [${cats.join(', ')}]\n`;
+            file += `---\n\n`;
+            file += data.content;
+            
+            return file;
+        }
+
+        // 3. Save File
+        async function saveFile() {
+            const content = buildFileContent();
+            const filename = sanitizeFilename(dom.title.value) + '.md';
+
+            // Nowoczesne API
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: 'Plik Markdown',
+                            accept: { 'text/markdown': ['.md'] },
+                        }],
+                    });
+                    const writable = await handle.createWritable();
+                    await writable.write(content);
+                    await writable.close();
+                    showToast('Zapisano plik na dysku!');
+                } catch (err) {
+                    // Użytkownik anulował lub błąd
+                    if (err.name !== 'AbortError') console.error(err);
+                }
+            } else {
+                // Fallback (stara metoda pobierania)
+                const blob = new Blob([content], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast('Pobrano plik (Fallback)');
+            }
+        }
+
+        // 4. Open File
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            readFile(file);
+        });
+
+        function readFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                parseAndLoad(text);
+                showToast('Wczytano plik: ' + file.name);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseAndLoad(text) {
+            const regex = /^---\s*[\r\n]+([\s\S]*?)[\r\n]+---\s*[\r\n]+([\s\S]*)$/;
+            const match = text.match(regex);
+            
+            if(match) {
+                const metaRaw = match[1];
+                const content = match[2];
+                
+                // Parsuj meta
+                metaRaw.split('\n').forEach(line => {
+                    const parts = line.split(':');
+                    if(parts.length >= 2) {
+                        const key = parts[0].trim();
+                        let val = parts.slice(1).join(':').trim();
+                        if(val.startsWith('[') && val.endsWith(']')) {
+                            val = val.slice(1, -1); // proste usuwanie nawiasów dla inputa
+                        }
+                        if(dom[key]) dom[key].value = val;
+                    }
+                });
+                dom.content.value = content.trim(); // remove leading newlines
+            } else {
+                dom.content.value = text;
+            }
+            updatePreview();
+            saveStateLocal();
+        }
+
+        // --- DRAG & DROP ---
+        const dropZone = document.getElementById('dropZone');
+        const overlay = document.getElementById('dragOverlay');
+
+        window.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            overlay.classList.add('active');
+        });
+        window.addEventListener('dragleave', (e) => {
+            if(e.relatedTarget === null) { // opuścił okno
+                 overlay.classList.remove('active');
+            }
+        });
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            overlay.classList.remove('active');
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if(file.name.endsWith('.md')) {
+                    readFile(file);
+                } else {
+                    showToast('To nie jest plik .md!', true);
+                }
+            }
+        });
+
+
+        // --- HELPERS ---
         function ins(start, end) {
-            const el = document.getElementById('content');
+            const el = dom.content;
             const [s, e] = [el.selectionStart, el.selectionEnd];
             el.setRangeText(start + el.value.substring(s, e) + end, s, e, 'select');
             updatePreview();
             el.focus();
+            saveStateLocal();
         }
 
-        // Insert Color Helper
         function insColor(color) {
             ins(`{c:${color}}`, '{/c}');
         }
 
-        // Live Preview Logic (Copy of main script logic)
+        function showToast(msg, error = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.background = error ? '#c0392b' : 'var(--accent)';
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
+        }
+
+        // --- PREVIEW RENDERER (Engine) ---
         function updatePreview() {
-            const rawContent = document.getElementById('content').value;
-            const title = document.getElementById('title').value;
-            const img = document.getElementById('image').value;
+            const rawContent = dom.content.value;
+            const title = dom.title.value;
+            const img = dom.image.value;
+            const author = dom.author.value;
+            const date = dom.date.value;
+            const avatar = dom.avatar.value;
+            
+            // Character count
+            document.getElementById('charCount').textContent = rawContent.length + " znaków";
 
             // 1. Colors
             let md = rawContent.replace(/\{c:([a-zA-Z0-9#]+)\}(.*?)\{\/c\}/g, '<span style="color:$1">$2</span>');
@@ -349,7 +603,7 @@
             // 2. Markdown Parse
             let html = marked.parse(md, { breaks: true, gfm: true });
 
-            // 3. Post-Processing (Callouts, etc.)
+            // 3. Post-Processing
             
             // Callouts
             html = html.replace(/<blockquote>\s*<p>\s*\[!(NOTE|WARNING|TIP|DANGER)\]\s?(.*?)<\/p>\s*<\/blockquote>/gs, (match, type, content) => {
@@ -367,49 +621,48 @@
                 `;
             });
 
-            // Images
+            // YouTube
+            html = html.replace(/<a href="youtube:([^"]+)">.*?<\/a>/g, 
+                '<div class="video-container"><iframe src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
+
+            // Images with Captions
             html = html.replace(/<img src="([^"]+)" alt="([^"]+)">/g, 
-                '<img src="$1" alt="$2"><span style="display:block;text-align:center;color:#888;font-size:0.8rem;margin-top:5px;font-style:italic;">$2</span>');
+                '<img src="$1" alt="$2" title="$2"><span style="display:block;text-align:center;color:#888;font-size:0.8rem;margin-top:5px;font-style:italic;">$2</span>');
 
             // Checklist
-            html = html.replace(/<li><input disabled="" type="checkbox"/g, '<li style="list-style:none"><input disabled type="checkbox"');
-            html = html.replace(/<li><input checked="" disabled="" type="checkbox"/g, '<li style="list-style:none"><input checked disabled type="checkbox"');
+            html = html.replace(/<li><input disabled="" type="checkbox"/g, '<li class="checklist-item"><input disabled type="checkbox"');
+            html = html.replace(/<li><input checked="" disabled="" type="checkbox"/g, '<li class="checklist-item"><input checked disabled type="checkbox"');
+
+            // Tabs Logic (Visual only in preview)
+            // Proste renderowanie tabów jako bloków w podglądzie
+            html = html.replace(/<div class="tabs" data-labels="([^"]+)">/g, (m, labels) => {
+                const lbs = labels.split(',');
+                let header = '<div class="tabs-container"><div class="tabs-header">';
+                lbs.forEach((l, i) => header += `<button class="tab-btn ${i===0?'active':''}">${l}</button>`);
+                header += '</div><div style="padding:20px; color:#888; font-style:italic; border-top:1px solid #333;">(Interaktywne zakładki będą działać na stronie głównej)</div>';
+                return header;
+            });
             
-            // Header Image in Preview
+            // Header construction
             let headerHtml = `<h1>${title}</h1>`;
+            
+            // Meta info
+            headerHtml += `<div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid #333;">`;
+            if(avatar) {
+                headerHtml += `<img src="${avatar}" style="width:40px; height:40px; border-radius:50%; margin:0; box-shadow:none;">`;
+            } else if(author) {
+                 headerHtml += `<img src="https://ui-avatars.com/api/?name=${author}&background=random&color=fff" style="width:40px; height:40px; border-radius:50%; margin:0; box-shadow:none;">`;
+            }
+            headerHtml += `<div><div style="font-weight:bold; color:#fff">${author}</div><div style="font-size:0.8rem; color:#888">${date}</div></div>`;
+            headerHtml += `</div>`;
+
             if(img) headerHtml += `<img src="${img}" style="max-height:300px; width:100%; object-fit:cover; border-radius:8px; margin-bottom:20px;">`;
 
             document.getElementById('previewCanvas').innerHTML = headerHtml + html;
         }
 
-        // Generate Final File
-        function generate() {
-            const data = {};
-            inputIds.forEach(k => data[k] = document.getElementById(k).value);
-            
-            const cats = data.categories.split(',').map(s => s.trim()).filter(s => s);
-            
-            // Konstrukcja pliku .md
-            const output = `---
-title: ${data.title}
-author: ${data.author}
-date: ${data.date}
-image: ${data.image}
-avatar: ${data.avatar}
-categories: [${cats.join(', ')}]
----
-
-${data.content}`;
-
-            document.getElementById('finalCode').value = output;
-            document.getElementById('modal').classList.add('show');
-            document.getElementById('finalCode').select();
-            
-            // Auto copy
-            navigator.clipboard.writeText(output).then(() => {
-                // opcjonalnie powiadomienie
-            });
-        }
+        // Initial render
+        updatePreview();
     </script>
 </body>
 </html>
