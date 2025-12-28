@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="system">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineNews - Nowości, zmiany, itp.</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Biblioteki -->
+     <link rel="icon" type="image/x-icon" href="minenews-logo-small.png">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@2.3.3/dist/purify.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div id="readingProgress" class="reading-progress"></div>
+
+    <nav class="navbar">
+        <a href="#" class="logo-link" id="logoBtn">
+            <div class="logo-text"><img src="minenews-logo-full.png" width="120px" draggable="false"></div>
+        </a>
+        
+        <div class="search-bar-container" id="navSearchBar">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Szukaj newsów...">
+            </div>
+        </div>
+
+        <div class="nav-right">
+            <div class="theme-toggle" id="themeToggle"><i class="fas fa-desktop"></i></div>
+        </div>
+    </nav>
+
+    <header class="hero" id="heroSection">
+        <div class="hero-bg" id="heroBg"></div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="mc-font">Najnowsze wiadomości ze świata Minecraft</h1>
+            <p>Wszystkie ważne informacje o rozwoju Minecraft.</p>
+        </div>
+    </header>
+
+    <div class="controls container" id="controlsSection">
+        <div class="controls-wrapper">
+            <div class="control-group">
+                <span class="control-label">Sortowanie:</span>
+                <select id="sortSelect" class="custom-select">
+                    <option value="newest">📅 Najnowsze</option>
+                    <option value="oldest">⏳ Najstarsze</option>
+                </select>
+            </div>
+            <div class="control-group categories-group">
+                <span class="control-label">Kategorie:</span>
+                <div id="categoryFilters" class="category-pills">
+                    <button class="pill active" data-cat="all">Wszystkie</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="container" id="mainContent">
+        <div id="articlesGrid" class="articles-grid"></div>
+    </main>
+
+    <section class="article-view-container hidden" id="articleView">
+        <div class="container article-container-width">
+            <div class="article-actions-bar">
+                <button class="btn-text" id="backBtn"><i class="fas fa-arrow-left"></i> Wróć</button>
+                <div class="article-meta-right">
+                    <span id="readTime" class="read-time"></span>
+                    <button class="btn-primary-small" id="shareBtn"><i class="fas fa-share-alt"></i> Udostępnij</button>
+                </div>
+            </div>
+
+            <div class="article-layout">
+                <aside class="article-sidebar">
+                    <div class="author-card sticky-sidebar">
+                        <div class="author-header">
+                            <img src="" id="artAuthorAvatar" class="author-avatar">
+                            <div class="author-details">
+                                <span class="label">Autor</span>
+                                <h4 id="artAuthorName">Nick</h4>
+                            </div>
+                        </div>
+                        <div class="article-sidebar-meta">
+                            <div class="meta-item"><i class="far fa-calendar-alt"></i> <span id="artDate">Data</span></div>
+                        </div>
+                        <div class="meta-tags" id="artCategories"></div>
+                    </div>
+                </aside>
+
+                <article class="article-content-wrapper">
+                    <div class="article-header">
+                        <img src="" id="artCover" class="article-cover-full">
+                        <h1 id="artTitle" class="article-main-title"></h1>
+                    </div>
+                    <div id="articleRenderer" class="markdown-body"></div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <div id="lightbox" class="lightbox hidden">
+        <span class="lightbox-close">&times;</span>
+        <img class="lightbox-content" id="lightboxImg">
+        <div id="lightboxCaption"></div>
+    </div>
+
+    <div id="toast" class="toast hidden">Skopiowano link!</div>
+
+    <footer>
+        <div class="footer-content container">
+            <div class="footer-brand">
+                <img src="minenews-logo-full.png" width="120px" class="mc-font" style="margin-left: 10px; user-select: none;" draggable="false">
+                <p>&copy; 2025 QozaWorks.</p>
+            </div>
+            <!-- <div class="footer-links">
+                <a href="#"><i class="fab fa-discord"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-youtube"></i></a>
+            </div> -->
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

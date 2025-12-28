@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>MineNews Generator PRO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --bg: #1e1e1e; --panel: #262626; --accent: #27ae60; --text: #eee; --border: #444; }
+        * { box-sizing: border-box; }
+        body { margin: 0; display: flex; height: 100vh; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
+        
+        .sidebar { width: 320px; background: var(--panel); border-right: 1px solid var(--border); padding: 20px; display: flex; flex-direction: column; gap: 15px; overflow-y: auto; }
+        .main { flex: 1; display: flex; flex-direction: column; }
+        
+        .toolbar { background: #333; padding: 10px 15px; border-bottom: 1px solid var(--border); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .t-btn { background: #444; border: none; color: #fff; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9rem; transition: 0.2s; }
+        .t-btn:hover { background: #555; }
+        .sep { width: 1px; height: 20px; background: #555; margin: 0 5px; }
+
+        .editor-container { flex: 1; display: flex; overflow: hidden; }
+        textarea#content { flex: 1; background: #1a1a1a; color: #ddd; border: none; padding: 20px; font-family: 'Consolas', monospace; font-size: 1rem; resize: none; outline: none; line-height: 1.6; }
+        .preview-pane { flex: 1; background: #fff; color: #333; padding: 30px; overflow-y: auto; border-left: 1px solid var(--border); }
+        
+        label { font-size: 0.8rem; color: #aaa; margin-bottom: 5px; display: block; }
+        input { width: 100%; padding: 10px; background: #111; border: 1px solid var(--border); color: #fff; border-radius: 5px; }
+        .btn-gen { background: var(--accent); color: #fff; width: 100%; padding: 12px; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; margin-top: auto; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.3s; z-index: 100; }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-box { background: #222; padding: 25px; border-radius: 12px; width: 600px; text-align: center; border: 1px solid #444; }
+        #finalCode { width: 100%; height: 300px; background: #000; color: #0f0; border: none; padding: 10px; font-family: monospace; margin-top: 15px; }
+
+        /* Preview specific styles (mini) */
+        .preview-pane h1 { border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .preview-pane img { max-width: 100%; }
+        .callout { padding: 15px; border-left: 5px solid #ccc; background: #f9f9f9; margin: 10px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <h2 style="margin:0; color:var(--accent)"><i class="fas fa-cube"></i> Generator</h2>
+        <div><label>Tytuł artykułu</label><input type="text" id="title"></div>
+        <div><label>Autor</label><input type="text" id="author"></div>
+        <div><label>Data (RRRR-MM-DD)</label><input type="date" id="date"></div>
+        <div><label>URL Okładki</label><input type="text" id="image"></div>
+        <div><label>Kategorie (po przecinku)</label><input type="text" id="categories" placeholder="News, Poradnik"></div>
+        <button class="btn-gen" onclick="generate()">Generuj Plik .MD</button>
+    </div>
+
+    <div class="main">
+        <div class="toolbar">
+            <button class="t-btn" onclick="ins('**', '**')"><i class="fas fa-bold"></i></button>
+            <button class="t-btn" onclick="ins('*', '*')"><i class="fas fa-italic"></i></button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="ins('### ', '')">H3</button>
+            <button class="t-btn" onclick="ins('> [!NOTE]\n> ', '')"><i class="fas fa-sticky-note"></i> Note</button>
+            <button class="t-btn" onclick="ins('> [!WARNING]\n> ', '')" style="color:#f39c12"><i class="fas fa-exclamation-triangle"></i> Warn</button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="ins('![Opis](', ')')"><i class="far fa-image"></i> Img</button>
+            <button class="t-btn" onclick="ins('[](youtube:', ')')"><i class="fab fa-youtube"></i> YT</button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="ins('\n| Nagłówek 1 | Nagłówek 2 |\n|---|---|\n| Treść 1 | Treść 2 |\n', '')"><i class="fas fa-table"></i> Tabela</button>
+            <button class="t-btn" onclick="ins('\n- [ ] Zadanie 1\n- [x] Zadanie 2\n', '')"><i class="fas fa-check-square"></i> Lista</button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="ins('<div class=\x22tabs\x22 data-labels=\x22Java,Bedrock\x22>\n<div>\n\nTreść Java\n\n</div>\n<div>\n\nTreść Bedrock\n\n</div>\n</div>', '')"><i class="fas fa-folder"></i> Taby</button>
+        </div>
+        <div class="editor-container">
+            <textarea id="content" placeholder="Tutaj wpisz treść artykułu..."></textarea>
+            <div id="preview" class="preview-pane"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="modal-box">
+            <h3>Gotowy kod</h3>
+            <p style="color:#aaa; font-size:0.9rem">Skopiuj i zapisz jako .md w folderze /articles</p>
+            <textarea id="finalCode" readonly></textarea>
+            <button class="t-btn" style="width:100%; justify-content:center; margin-top:10px; background:#444;" onclick="document.getElementById('modal').classList.remove('show')">Zamknij</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+        const inputs = ['title', 'author', 'date', 'image', 'categories', 'content'];
+        inputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
+
+        function updatePreview() {
+            const txt = document.getElementById('content').value;
+            // Prosty podgląd (bez zaawansowanych funkcji jak w script.js, ale wystarczający)
+            let html = marked.parse(txt);
+            
+            // Fix Callouts preview
+            html = html.replace(/<blockquote>\s*<p>\[!(NOTE|WARNING|TIP|DANGER)\]\s?(.*?)<\/p>\s*<\/blockquote>/gs, 
+                (m, type, content) => `<div class="callout" style="border-left-color:${getColor(type)}"><b>${type.toUpperCase()}:</b> ${content}</div>`);
+            
+            document.getElementById('preview').innerHTML = `<h1>${document.getElementById('title').value}</h1>` + html;
+        }
+
+        function getColor(type) {
+            if(type=='NOTE') return 'blue';
+            if(type=='WARNING') return 'orange';
+            if(type=='TIP') return 'green';
+            return 'red';
+        }
+
+        function ins(start, end) {
+            const el = document.getElementById('content');
+            const [s, e] = [el.selectionStart, el.selectionEnd];
+            el.setRangeText(start + el.value.substring(s, e) + end, s, e, 'select');
+            updatePreview();
+        }
+
+        function generate() {
+            const data = {};
+            inputs.forEach(k => data[k] = document.getElementById(k).value);
+            const cats = data.categories.split(',').map(s=>s.trim()).filter(s=>s);
+            
+            const out = `---
+title: ${data.title}
+author: ${data.author}
+date: ${data.date}
+image: ${data.image}
+categories: [${cats.join(', ')}]
+---
+
+${data.content}`;
+
+            document.getElementById('finalCode').value = out;
+            document.getElementById('modal').classList.add('show');
+            document.getElementById('finalCode').select();
+            navigator.clipboard.writeText(out);
+        }
+    </script>
+</body>
+</html>
