@@ -22,10 +22,6 @@ W serwisie publikowane będą między innymi artykuły opisujące zmiany wprowad
 Serwis ma charakter informacyjny i społecznościowy. Już wkrótce powstanie specjalny serwer {c:#3ec3f0}Discord{/c}, na którym każdy zainteresowany będzie mógł dołączyć do społeczności i spróbować swoich sił jako reporter, współtworząc treści oraz dzieląc się informacjami i spostrzeżeniami ze świata Minecraft.
 
 ## {c:#e83f3f}Dziękujemy za zainteresowanie i zapraszamy do śledzenia serwisu od dnia jego oficjalnego startu.{/c}
-<br>
-<br>
-
-
 
 ### Najważniejsze z tego artykułu:
 > - **Start serwisu:** 28.12.2025
