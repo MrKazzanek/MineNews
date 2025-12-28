@@ -49,7 +49,7 @@ const dom = {
 // --- INIT ---
 async function init() {
     initTheme();
-    initHero(); // Tutaj jest nowa, naprawiona funkcja
+    initHero();
     initListeners();
     await loadArticles();
     handleRouting();
@@ -144,7 +144,7 @@ function renderMarkdown(raw) {
 
     // YouTube
     html = html.replace(/<a href="youtube:([^"]+)">.*?<\/a>/g, 
-        '<div class="video-container"><iframe src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
+        '<div class="video-container"><iframe src=" frameborder="0" allowfullscreen></iframe></div>');
 
     // Code
     html = html.replace(/<pre><code/g, '<div class="code-wrapper"><button class="copy-btn" onclick="copyCode(this)">Kopiuj</button><pre><code');
@@ -180,7 +180,10 @@ function openArticleView(article) {
     dom.artTitle.textContent = article.meta.title || 'Bez tytułu';
     dom.artCover.src = article.meta.image || '';
     dom.artAuthorName.textContent = article.meta.author || 'Anonim';
-    dom.artAuthorAvatar.src = `https://ui-avatars.com/api/?name=${article.meta.author || 'A'}&background=random&color=fff`;
+    
+    // OBSŁUGA AVATARA (WŁASNY LUB GENEROWANY)
+    dom.artAuthorAvatar.src = article.meta.avatar || `https://ui-avatars.com/api/?name=${article.meta.author || 'A'}&background=random&color=fff`;
+    
     dom.artDate.textContent = article.meta.date || '';
     
     const cats = Array.isArray(article.meta.categories) ? article.meta.categories : [article.meta.categories];
@@ -377,11 +380,10 @@ function initHero() {
     if (slides.length < 2) return;
 
     // Tworzymy drugą warstwę (back-layer) do płynnego przejścia
-    // Będzie ona zawsze "pod spodem"
     const bgBack = document.createElement('div');
-    bgBack.className = 'hero-bg'; // Dziedziczy style CSS
+    bgBack.className = 'hero-bg'; 
     bgBack.id = 'heroBgBack';
-    bgBack.style.zIndex = '-3'; // Pod głównym tłem (które ma -2)
+    bgBack.style.zIndex = '-3'; 
     bgBack.style.backgroundImage = `url(${slides[0]})`;
     
     // Dodajemy do DOM
@@ -394,16 +396,15 @@ function initHero() {
         // 1. Ustawiamy spodnią warstwę na NOWE zdjęcie
         bgBack.style.backgroundImage = `url(${nextImg})`;
 
-        // 2. Wygaszamy górną warstwę (stare zdjęcie), co płynnie odsłania spodnią warstwę
+        // 2. Wygaszamy górną warstwę (stare zdjęcie)
         dom.heroBg.style.opacity = '0';
 
         // 3. Po zakończeniu animacji (1s) podmieniamy zdjęcie na górze i przywracamy opacity
         setTimeout(() => {
             dom.heroBg.style.backgroundImage = `url(${nextImg})`;
-            // Resetujemy opacity na 1 (nie widać zmiany, bo zdjęcia są teraz identyczne na obu warstwach)
             dom.heroBg.style.opacity = '1';
             i = nextIndex;
-        }, 1000); // 1000ms musi odpowiadać transition: opacity 1s
+        }, 1000); 
 
     }, 6000); // Zmiana co 6 sekund
 }
