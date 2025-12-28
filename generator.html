@@ -47,6 +47,7 @@
         <div><label>Autor</label><input type="text" id="author"></div>
         <div><label>Data (RRRR-MM-DD)</label><input type="date" id="date"></div>
         <div><label>URL Okładki</label><input type="text" id="image"></div>
+        <div><label>Avatar Autora (URL opcjonalny)</label><input type="text" id="avatar" placeholder="Pozostaw puste dla domyślnego"></div>
         <div><label>Kategorie (po przecinku)</label><input type="text" id="categories" placeholder="News, Poradnik"></div>
         <button class="btn-gen" onclick="generate()">Generuj Plik .MD</button>
     </div>
@@ -85,7 +86,7 @@
 
     <script>
         document.getElementById('date').valueAsDate = new Date();
-        const inputs = ['title', 'author', 'date', 'image', 'categories', 'content'];
+        const inputs = ['title', 'author', 'date', 'image', 'avatar', 'categories', 'content'];
         inputs.forEach(id => document.getElementById(id).addEventListener('input', updatePreview));
 
         function updatePreview() {
@@ -124,6 +125,7 @@ title: ${data.title}
 author: ${data.author}
 date: ${data.date}
 image: ${data.image}
+avatar: ${data.avatar}
 categories: [${cats.join(', ')}]
 ---
 
