@@ -86,7 +86,7 @@ Dla zwykłych graczy Minecrafta w praktyce niewiele się zmieni. Największą r�
 ## Polecane materiały do obejrzenia:
 
 Zmianę bardzo dobrze omówił [<u>Jurajski Staś</u>](https://www.youtube.com/@JurajskiStas) na swoim kanale YouTube.
-<iframe width="560" height="315" src="https://www.youtube.com/embed/N7nlaW1kzxQ?si=p_d1oo-S90hM5aXe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+<iframe width="90%" height="315" src="https://www.youtube.com/embed/N7nlaW1kzxQ?si=p_d1oo-S90hM5aXe" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 
 #### Źródła:
 - [<u>minecraft.net</u>](https://www.minecraft.net/)
