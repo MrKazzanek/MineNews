@@ -2,23 +2,24 @@
 <html lang="pl" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <title>MineNews Studio</title>
-    <!-- Fonty -->
+    <title>MineNews Studio - Edytor</title>
+    <!-- Fonty (Te same co na głównej stronie) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <!-- Biblioteki -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
+        /* --- ZMIENNE (Skopiowane z style.css dark theme dla spójności) --- */
         :root {
             --bg-app: #121212;
             --bg-panel: #1e1e1e;
             --bg-input: #2d2d2d;
             --border: #333;
-            --accent: #27ae60;
-            --accent-hover: #219150;
+            --accent: #8827ae; /* Kolor akcentu z głównej strony */
+            --accent-hover: #c55aef;
             --text-main: #e0e0e0;
-            --text-muted: #858585;
+            --text-muted: #a0a0a0;
             --font-ui: 'Inter', sans-serif;
             --font-code: 'JetBrains Mono', monospace;
             --tooltip-bg: #252526;
@@ -100,7 +101,7 @@
         }
         input:focus { outline: none; border-color: var(--accent); }
 
-        /* Snapshot Section */
+        /* Snapshots */
         .snapshots {
             border-top: 1px solid var(--border);
             padding-top: 15px;
@@ -142,7 +143,7 @@
         /* --- MAIN AREA --- */
         .main { flex: 1; display: flex; flex-direction: column; min-width: 0; position: relative; }
 
-        /* TOP BAR */
+        /* TOOLBAR */
         .toolbar {
             background: var(--bg-panel);
             border-bottom: 1px solid var(--border);
@@ -230,55 +231,87 @@
             outline: none;
         }
 
-        /* ZOOM TEXT */
-        body.font-small textarea#content { font-size: 12px; }
-        body.font-large textarea#content { font-size: 18px; }
-
+        /* --- PREVIEW STYLES (ZGODNE W 100% Z STYLE.CSS) --- */
         .preview-pane {
             flex: 1;
-            background: #121212;
+            background: #121212; /* var(--bg-color) z ciemnego motywu */
             padding: 40px;
             overflow-y: auto;
-            color: #e0e0e0;
-            scroll-behavior: auto; /* Obsługiwane przez JS */
+            color: #e0e0e0; /* var(--text-color) */
+            scroll-behavior: auto; /* JS handles syncing */
         }
 
-        /* --- PREVIEW STYLES --- */
-        .preview-content { font-family: 'Inter', sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; }
-        .preview-content h1, .preview-content h2, .preview-content h3, .preview-content h4 { color: #fff; margin: 20px 0 10px; line-height: 1.3; }
-        .preview-content h1 { font-size: 2.2rem; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .preview-content h2 { font-size: 1.8rem; border-bottom: 1px solid #333; padding-bottom: 8px; }
-        .preview-content p { margin-bottom: 15px; color: #ccc; }
-        .preview-content img { max-width: 100%; border-radius: 8px; margin: 15px 0; }
-        .preview-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+        .preview-content { 
+            font-family: 'Inter', sans-serif; 
+            line-height: 1.7; 
+            max-width: 1300px; /* Zgodnie z index.html */
+            margin: 0 auto; 
+        }
+
+        .preview-content h1, .preview-content h2, .preview-content h3, .preview-content h4 { 
+            color: #e0e0e0; 
+            margin-top: 25px; 
+            margin-bottom: 15px; 
+            line-height: 1.3; 
+        }
+        
+        /* Styl Nagłówka Artykułu (Header w podglądzie) */
+        .article-header-preview { margin-bottom: 30px; }
+        .article-header-preview h1 { font-size: 2.5rem; border: none; margin-bottom: 10px; color: #e0e0e0; }
+        .article-meta-preview { display: flex; gap: 15px; color: #a0a0a0; font-size: 0.9rem; margin-bottom: 20px; align-items: center; }
+        .article-meta-preview img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent); }
+        .article-cover-preview { width: 100%; height: 350px; object-fit: cover; border-radius: 12px; margin-bottom: 20px; }
+
+        /* Style Markdowna (Zgodne z style.css) */
+        .preview-content h1 { border-bottom: none; } /* Główny tytuł jest w headerze */
+        .preview-content h2 { font-size: 1.8rem; border-bottom: 2px solid #333; padding-bottom: 8px; margin: 30px 0 20px; }
+        .preview-content h3 { font-size: 1.4rem; margin: 25px 0 15px; }
+        .preview-content p { margin-bottom: 18px; color: #e0e0e0; }
+        .preview-content img { max-width: 100%; border-radius: 8px; margin-top: 20px; display: block; }
+        .img-caption { display: block; text-align: center; color: #a0a0a0; font-size: 0.85rem; margin-bottom: 20px; margin-top: 5px; font-style: italic; }
+        
+        .preview-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: 0.2s; }
+        .preview-content strong { color: #e0e0e0; font-weight: 700; }
+        .preview-content ul, .preview-content ol { padding-left: 25px; margin-bottom: 20px; }
+        .preview-content li { margin-bottom: 8px; }
+        .preview-content blockquote { border-left: 4px solid var(--accent); padding-left: 20px; color: #a0a0a0; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 0 8px 8px 0; margin: 25px 0; }
         .preview-content hr { border: none; border-top: 1px solid #333; margin: 30px 0; }
         
-        .preview-content blockquote { border-left: 4px solid var(--accent); padding-left: 15px; color: #888; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 0 4px 4px 0; margin: 20px 0; }
-        
-        .preview-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.9em; }
+        /* Code */
+        .preview-content code { background: #282c34; padding: 2px 6px; border-radius: 4px; font-family: var(--font-code); font-size: 0.9em; border: 1px solid #333; }
         .preview-content pre { background: #000; padding: 15px; border-radius: 8px; overflow-x: auto; margin: 20px 0; border: 1px solid #333; }
-        .preview-content pre code { background: none; padding: 0; }
+        .preview-content pre code { background: none; padding: 0; border: none; }
         
+        /* Tables */
         .preview-content table { width: 100%; border-collapse: collapse; background: #1e1e1e; border-radius: 8px; overflow: hidden; margin: 20px 0; border: 1px solid #333; }
-        .preview-content th, .preview-content td { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
-        .preview-content th { background: rgba(255,255,255,0.05); color: #fff; }
+        .preview-content th, .preview-content td { padding: 12px 15px; border-bottom: 1px solid #333; text-align: left; }
+        .preview-content th { background: rgba(255,255,255,0.05); color: #fff; font-weight: 700; }
 
-        /* Callouts */
-        .callout { display: flex; gap: 15px; padding: 15px 20px; border-radius: 8px; margin: 20px 0; border-left: 5px solid; background: rgba(255,255,255,0.03); align-items: flex-start; }
-        .callout-icon { font-size: 1.2rem; line-height: 1.6; width: 24px; text-align: center; flex-shrink: 0; }
-        .callout-content { flex: 1; font-size: 0.95rem; line-height: 1.6; margin-top: -1px; }
+        /* Callouts - Zgodne z naprawionym style.css */
+        .callout { display: flex; gap: 16px; padding: 16px 20px; border-radius: 8px; margin: 25px 0; border-left: 5px solid; background: rgba(255,255,255,0.03); align-items: flex-start; }
+        .callout-icon { font-size: 1.25rem; line-height: 1.6; width: 24px; text-align: center; flex-shrink: 0; margin-top: 0; }
+        .callout-content { flex: 1; min-width: 0; font-size: 1rem; line-height: 1.6; align-self: flex-start; margin-top: -1px; }
         .callout-content p { margin: 0; }
+        
         .callout-note { border-color: #3498db; color: #85c1e9; }
         .callout-warning { border-color: #f39c12; color: #f8c471; }
         .callout-tip { border-color: #27ae60; color: #82e0aa; }
         .callout-danger { border-color: #c0392b; color: #ec7063; }
+
+        /* YouTube */
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; margin: 30px 0; background: #000; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        /* Spoiler */
+        .spoiler { background: #ccc; color: #ccc; padding: 0 4px; border-radius: 4px; cursor: pointer; user-select: none; }
+        .spoiler:hover { color: #000; }
 
         /* Notification */
         .toast { position: fixed; bottom: 40px; right: 20px; background: var(--accent); color: white; padding: 10px 20px; border-radius: 4px; font-weight: 600; transform: translateY(100px); transition: 0.3s; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .toast.show { transform: translateY(0); }
 
         /* Drag Overlay */
-        .drag-overlay { position: absolute; inset: 0; background: rgba(39, 174, 96, 0.2); border: 2px dashed var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 50; opacity: 0; pointer-events: none; transition: 0.2s; backdrop-filter: blur(2px); }
+        .drag-overlay { position: absolute; inset: 0; background: rgba(136, 39, 174, 0.2); border: 2px dashed var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #fff; z-index: 50; opacity: 0; pointer-events: none; transition: 0.2s; backdrop-filter: blur(2px); }
         .drag-overlay.active { opacity: 1; }
 
     </style>
@@ -290,7 +323,7 @@
     <!-- SIDEBAR -->
     <div class="sidebar" id="sidebar">
         <div class="brand">
-            <span> MineNews Studio</span>
+            <span><i class="fas fa-cube"></i> Studio</span>
             <button class="reset-btn" onclick="resetForm()" data-tooltip="Wyczyść wszystko"><i class="fas fa-trash-alt"></i></button>
         </div>
         
@@ -329,9 +362,9 @@
         <div class="toolbar">
             <!-- Headers -->
             <div class="toolbar-group">
-                <button class="t-btn" onclick="ins('# ', '')" data-tooltip="Nagłówek 1">H1</button>
-                <button class="t-btn" onclick="ins('## ', '')" data-tooltip="Nagłówek 2">H2</button>
-                <button class="t-btn" onclick="ins('### ', '')" data-tooltip="Nagłówek 3">H3</button>
+                <button class="t-btn" onclick="ins('# ', '')" data-tooltip="Nagłówek 1 (Tytuł główny)">H1</button>
+                <button class="t-btn" onclick="ins('## ', '')" data-tooltip="Nagłówek 2 (Sekcja)">H2</button>
+                <button class="t-btn" onclick="ins('### ', '')" data-tooltip="Nagłówek 3 (Podsekcja)">H3</button>
                 <button class="t-btn" onclick="ins('#### ', '')" data-tooltip="Nagłówek 4">H4</button>
             </div>
 
@@ -384,8 +417,6 @@
 
             <!-- Editor Tools -->
             <div class="toolbar-group" style="margin-left: auto; border-right: none;">
-                <button class="t-btn" onclick="changeFontSize(-1)" data-tooltip="Mniejsza czcionka"><i class="fas fa-font" style="font-size:0.7em"></i></button>
-                <button class="t-btn" onclick="changeFontSize(1)" data-tooltip="Większa czcionka"><i class="fas fa-font"></i></button>
                 <button class="t-btn active" onclick="toggleSyncScroll()" id="syncBtn" data-tooltip="Synchronizuj przewijanie"><i class="fas fa-arrows-alt-v"></i></button>
             </div>
         </div>
@@ -443,7 +474,7 @@
             });
         });
 
-        // --- TOOLTIPS SYSTEM (Manual to avoid cutting off) ---
+        // --- TOOLTIPS SYSTEM ---
         function initTooltips() {
             const tooltip = document.getElementById('global-tooltip');
             document.querySelectorAll('[data-tooltip]').forEach(el => {
@@ -494,14 +525,6 @@
 
         function insertLink() { ins('[Tekst](URL)', ''); }
 
-        function changeFontSize(delta) {
-            const el = document.body;
-            if(delta > 0) el.classList.add('font-large');
-            else el.classList.remove('font-large');
-            if(delta < 0) el.classList.add('font-small');
-            else el.classList.remove('font-small');
-        }
-
         // --- SYNC SCROLL ---
         function toggleSyncScroll() {
             syncScrollEnabled = !syncScrollEnabled;
@@ -541,7 +564,6 @@
                 div.innerHTML = `
                     <div class="snap-info" onclick="restoreSnap(${idx})" title="Kliknij, aby przywrócić">${snap.name}</div>
                     <div class="snap-actions">
-                        <i class="fas fa-upload" onclick="restoreSnap(${idx})" title="Przywróć"></i>
                         <i class="fas fa-trash" onclick="deleteSnap(${idx})" title="Usuń"></i>
                     </div>
                 `;
@@ -631,6 +653,22 @@
             showToast('Plik wczytany');
         }
 
+        // --- DRAG & DROP ---
+        const dropZone = document.getElementById('dropZone');
+        const overlay = document.getElementById('dragOverlay');
+
+        window.addEventListener('dragover', (e) => { e.preventDefault(); overlay.classList.add('active'); });
+        window.addEventListener('dragleave', (e) => { if(e.relatedTarget === null) overlay.classList.remove('active'); });
+        window.addEventListener('drop', (e) => {
+            e.preventDefault();
+            overlay.classList.remove('active');
+            if (e.dataTransfer.files.length > 0) {
+                const file = e.dataTransfer.files[0];
+                if(file.name.endsWith('.md')) readFile(file);
+                else showToast('To nie jest plik .md!', true);
+            }
+        });
+
         // --- CORE LOGIC ---
         function updatePreview() {
             const raw = dom.content.value;
@@ -639,13 +677,13 @@
             document.getElementById('charCount').textContent = raw.length + " zn.";
             document.getElementById('wordCount').textContent = raw.split(/\s+/).filter(n => n != '').length + " słów";
             document.getElementById('lineCount').textContent = raw.split(/\r\n|\r|\n/).length + " linii";
-            document.getElementById('readTime').textContent = Math.ceil(raw.split(/\s+/).length / 200) + " min czytania";
+            document.getElementById('readTime').textContent = Math.ceil(raw.split(/\s+/).length / 200) + " min";
 
             // Markdown
             let md = raw.replace(/\{c:([a-zA-Z0-9#]+)\}(.*?)\{\/c\}/g, '<span style="color:$1">$2</span>');
             let html = marked.parse(md, { breaks: true, gfm: true });
 
-            // Post-Process
+            // Post-Process (Same as main site)
             html = html.replace(/<blockquote>\s*<p>\s*\[!(NOTE|WARNING|TIP|DANGER)\]\s?(.*?)<\/p>\s*<\/blockquote>/gs, (m, t, c) => {
                 const type = t.toLowerCase();
                 let icon = 'fa-info-circle';
@@ -656,7 +694,7 @@
             });
 
             html = html.replace(/<a href="youtube:([^"]+)">.*?<\/a>/g, '<div class="video-container"><iframe src="https://www.youtube.com/embed/$1" frameborder="0" allowfullscreen></iframe></div>');
-            html = html.replace(/<img src="([^"]+)" alt="([^"]+)">/g, '<img src="$1" alt="$2" title="$2"><span style="display:block;text-align:center;color:#888;font-size:0.8rem;margin-top:5px;font-style:italic;">$2</span>');
+            html = html.replace(/<img src="([^"]+)" alt="([^"]+)">/g, '<img src="$1" alt="$2" title="$2"><span class="img-caption">$2</span>');
             html = html.replace(/\|\|(.*?)\|\|/g, '<span class="spoiler" title="Spoiler">$1</span>');
             html = html.replace(/<li><input disabled="" type="checkbox"/g, '<li style="list-style:none; display:flex; gap:10px;"><input disabled type="checkbox"');
             html = html.replace(/<li><input checked="" disabled="" type="checkbox"/g, '<li style="list-style:none; display:flex; gap:10px;"><input checked disabled type="checkbox"');
@@ -669,26 +707,27 @@
                 return h;
             });
 
-            // Render Header
-            let header = `<h1>${dom.title.value}</h1>`;
-            header += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:10px;border-bottom:1px solid #333">`;
-            if(dom.avatar.value) header += `<img src="${dom.avatar.value}" style="width:40px;height:40px;border-radius:50%;margin:0">`;
-            else if(dom.author.value) header += `<img src="https://ui-avatars.com/api/?name=${dom.author.value}&background=random&color=fff" style="width:40px;height:40px;border-radius:50%;margin:0">`;
-            header += `<div><div style="font-weight:bold;color:#fff">${dom.author.value}</div><div style="font-size:0.8rem;color:#888">${dom.date.value}</div></div></div>`;
-            if(dom.image.value) header += `<img src="${dom.image.value}" style="width:100%;max-height:300px;object-fit:cover;border-radius:8px">`;
+            // Shortcuts
+            document.addEventListener('keydown', e => {
+                if(e.ctrlKey) {
+                    if(e.key === 's') { e.preventDefault(); saveFile(); }
+                    if(e.key === 'b') { e.preventDefault(); ins('**', '**'); }
+                    if(e.key === 'i') { e.preventDefault(); ins('*', '*'); }
+                    if(e.key === 'u') { e.preventDefault(); ins('<u>', '</u>'); }
+                }
+            });
+
+            // Render Header Preview
+            let header = `<div class="article-header-preview"><h1>${dom.title.value}</h1>`;
+            header += `<div class="article-meta-preview">`;
+            if(dom.avatar.value) header += `<img src="${dom.avatar.value}">`;
+            else if(dom.author.value) header += `<img src="https://ui-avatars.com/api/?name=${dom.author.value}&background=random&color=fff">`;
+            header += `<div><div style="font-weight:bold;color:#fff">${dom.author.value}</div><div>${dom.date.value}</div></div></div>`;
+            if(dom.image.value) header += `<img src="${dom.image.value}" class="article-cover-preview">`;
+            header += `</div>`;
 
             document.getElementById('previewCanvas').innerHTML = header + html;
         }
-
-        // Shortcuts
-        document.addEventListener('keydown', e => {
-            if(e.ctrlKey) {
-                if(e.key === 's') { e.preventDefault(); saveFile(); }
-                if(e.key === 'b') { e.preventDefault(); ins('**', '**'); }
-                if(e.key === 'i') { e.preventDefault(); ins('*', '*'); }
-                if(e.key === 'u') { e.preventDefault(); ins('<u>', '</u>'); }
-            }
-        });
 
         function saveStateLocal() {
             const d = {}; inputIds.forEach(id => d[id] = dom[id].value);
@@ -698,17 +737,19 @@
             const s = localStorage.getItem('mineNewsDraft');
             if(s) { const d = JSON.parse(s); inputIds.forEach(id => { if(d[id]) dom[id].value = d[id]; }); updatePreview(); }
         }
+        
         function resetForm() {
-            if(confirm("Czy na pewno wyczyścić wszystko (w tym kopie zapasowe)?")) {
+            if(confirm("Wyczyścić wszystko? To usunie również historię kopii zapasowych.")) {
                 inputIds.forEach(id => dom[id].value = '');
                 dom.date.valueAsDate = new Date();
                 localStorage.removeItem('mineNewsDraft');
-                localStorage.removeItem('mineSnapshots'); // Usuwa też kopie zapasowe
-                loadSnapshots();
+                localStorage.removeItem('mineSnapshots'); // Usuwa snapshoty
+                loadSnapshots(); // Odświeża listę
                 updatePreview();
                 showToast("Wyczyszczono dane");
             }
         }
+        
         function showToast(msg) {
             const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
             setTimeout(()=>t.classList.remove('show'), 3000);
@@ -718,4 +759,3 @@
     </script>
 </body>
 </html>
-
